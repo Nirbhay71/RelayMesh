@@ -18,9 +18,8 @@ const createUser = async (userData) => {
         return existingUser;
     }
 
-    const password = userData.authType === "google"
-        ? userData.password                          // placeholder (googleId)
-        : bcrypt.hashSync(userData.password, 10);    // hash for local
+    // Don't hash here! The User model has a pre-save hook that handles hashing.
+    const password = userData.password;
 
     const user = await UserModel.create({
         username: userData.username,
