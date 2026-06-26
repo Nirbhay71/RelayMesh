@@ -1,0 +1,55 @@
+Functionalities 
+    1. Each user can add/delete a new contact
+    2. Each user can talk (message) with the it's own contact
+    3. Each user can see the status (online or offline) of a contacts
+    4. Each user can see wheather the contact is typing or not
+    5. Each user can see the message history of a contacts
+    6. Each user can add/edit/delete a group of contacts
+    7. Each user can see the which contacts are online
+    8. Each user can see which contacts are typing
+    9. Each user can see the message history of a group of contacts (Here if a user comes in group after some messages are already sent then late joined users should be able to see those messages as well) or (should not keep that) I need advice in this.
+  */
+
+F1: 
+    Frontend
+    s-1 : Click on create new Contact
+    s-2 : Enter contact's name and email
+    s-3 : Click on save button.
+    Backend
+    s-4 : Check user with provided email exists in DB.
+    s-5 : Create new Contacts entry (id(auto generate), mine(Foreign Key to User(id) will get from toke no db call needed), userId(no db call needed just found in s-4), userName, userEmail)
+    s-6 : create a room with name (mine:userId)
+
+Database Schema
+    Initial :- 
+    User {id, name, email, authType, refreshToken, password(Hashed password), ContactList[{userId, userName, userEmail, chatHistory{message, timestamp, senderId}}]}
+
+    1NF :- 
+    User {id(Primary Key), name, email, authType, avatar, refreshToken, password(Hashed password)}
+    Contacts {id(Primary Key), mine(Foreign Key to User(id)), userId, userName, userEmail}
+    ChatHistory {id(auto generated as Primary Key), roomId(Foreign Key to Contacts(id)), message, timestamp, senderId}
+    
+    Indexing :-
+        User(id) (For finding the avatar)
+        Contacts(mine, userId)  (For finding the roomId for ChatHistory)
+        ChatHistory(roomId) (For finding the ChatHistory entry in DB)
+
+
+F2:
+    Frontend
+    s-1 : User clicks on the button of the on which users name is written
+    Backend
+    s-2 : User joins room with name (mine:userId)
+    Frontend
+    s-3 : User writes the message.
+    s-4 : User clicks on send button to send the message.
+    s-5 : frontend sends the message in the room
+    Backend
+    s-6 : Backend listens to room and then broadcasts to the room.
+    s-7 : The message will be saved on the DB as well.
+
+
+
+Future Scope : 
+    1. Each user can see message is delivered (single tick), recived by reciver(double tick) and read by reciver(double tick with blue color) (Just like whatsapp)
+    2. Each user can see message is delivered (single tick), recived by list of reciver(double tick) and read by list of reciver(double tick with blue color) (Just like whatsapp)

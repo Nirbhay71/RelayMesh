@@ -1,0 +1,46 @@
+config:
+  # Use http engine as the base — our custom processor handles
+  # socket.io connections directly with socket.io-client v4
+  target: "http://localhost:7100"
+  
+  # ─────────────────────────────────────────────────────────────
+  # LOAD PHASES
+  # ─────────────────────────────────────────────────────────────
+  phases:
+    - name: "Phase 1: Warm Up"
+      duration: 30
+      arrivalRate: 5
+      rampTo: 20
+
+    - name: "Phase 2: Growing Load"
+      duration: 60
+      arrivalRate: 20
+      rampTo: 80
+
+    - name: "Phase 3: Peak Storm"
+      duration: 60
+      arrivalRate: 80
+      rampTo: 200
+
+    - name: "Phase 4: Hold the Peak"
+      duration: 60
+      arrivalRate: 200
+
+    - name: "Phase 5: Ramp Down"
+      duration: 30
+      arrivalRate: 200
+      rampTo: 10
+
+  # Custom processor — handles socket.io-client v4 directly
+  processor: "./helper.cjs"
+
+# ─────────────────────────────────────────────────────────────
+# SCENARIO — uses http engine + custom function flow
+# Our processor creates real socket.io-client v4 connections
+# with proper { auth: { token } } — no Artillery engine bugs
+# ─────────────────────────────────────────────────────────────
+scenarios:
+  - name: "Full Chat User Session"
+    beforeScenario: "setupUser"
+    flow:
+      - function: "runChatSession"

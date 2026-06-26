@@ -1,7 +1,6 @@
 import { ApiError } from "../utils/ApiError.js";
 import { UserModel } from "../models/user.models.js";
 import { sendWelcomeEmail } from "../utils/email.utils.js";
-import bcrypt from "bcryptjs";
 
 const createUser = async (userData) => {
     if (!userData) throw new ApiError(400, "Please provide all required fields");

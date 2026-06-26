@@ -2,12 +2,32 @@ import { asyncHandler } from "../utils/asyncHandler.js"
 import { ApiResponce } from "../utils/ApiResponce.js"
 import { ApiError } from "../utils/ApiError.js"
 import { createUser } from "../utils/user.utils.js"
+import { createSession } from "../utils/session.utils.js"
 import { UserModel } from "../models/user.models.js"
+import { SessionModel } from "../models/session.model.js"
 import jwt from "jsonwebtoken"
 
+/**
+ * Cookie configuration shared across all auth endpoints.
+ * httpOnly: prevents XSS access to tokens
+ * secure: HTTPS only in production
+ * sameSite: CSRF protection
+ */
+const cookieOptions = (req) => ({
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "Lax",
+})
+
+// ─────────────────────────────────────────────────
 // POST /auth/register
+// ─────────────────────────────────────────────────
 const registerUser = asyncHandler(async (req, res) => {
     const { username, email, password } = req.body;
+
+    const existingUser = await UserModel.findOne({ email });
+
+    if (existingUser) throw new ApiError(400, "User already exists with given email.");
 
     const user = await createUser({ username, email, password, authType: "local" });
 
@@ -16,7 +36,10 @@ const registerUser = asyncHandler(async (req, res) => {
     );
 })
 
+// ─────────────────────────────────────────────────
 // POST /auth/login
+// Creates a new Session document for multi-device support
+// ─────────────────────────────────────────────────
 const loginUser = asyncHandler(async (req, res) => {
     const { email, password } = req.body;
 
@@ -24,117 +47,148 @@ const loginUser = asyncHandler(async (req, res) => {
         throw new ApiError(400, "Email and password are required");
     }
 
-    // Find user by email
     const user = await UserModel.findOne({ email });
 
     if (!user) {
         throw new ApiError(404, "No account found with this email");
     }
 
-    // Block Google users from logging in with password
+    // Block OAuth users from logging in with password
     if (user.authType !== "local") {
         throw new ApiError(403, `This account uses ${user.authType} login. Please use that instead.`);
     }
 
-    // Check password
     const isPasswordValid = await user.isPasswordCorrect(password);
     if (!isPasswordValid) {
         throw new ApiError(401, "Incorrect password");
     }
 
-    // Generate tokens and set cookies
-    const { accessToken, refreshToken } = await user.generateToken();
+    // Create a session (generates tokens + persists refresh token in Session collection)
+    const { accessToken, refreshToken } = await createSession(user, req);
 
-    const cookieOptions = {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
-        sameSite: "Lax",
-    };
+    const options = cookieOptions(req);
 
     return res
         .cookie("accessToken", accessToken, {
-            ...cookieOptions,
+            ...options,
             maxAge: 15 * 60 * 1000           // 15 minutes
         })
         .cookie("refreshToken", refreshToken, {
-            ...cookieOptions,
+            ...options,
             maxAge: 7 * 24 * 60 * 60 * 1000  // 7 days
         })
         .status(200)
         .json(new ApiResponce(200, { user }, "Logged in successfully"));
 })
 
+// ─────────────────────────────────────────────────
 // POST /auth/refresh-token
+// Rotates the refresh token: invalidates old session, creates new one
+// ─────────────────────────────────────────────────
 const refreshAccessToken = asyncHandler(async (req, res) => {
     const incomingRefreshToken = req.cookies?.refreshToken;
 
     if (!incomingRefreshToken) throw new ApiError(401, "No refresh token provided");
 
-    // Verify the refresh token signature
+    // Verify the JWT signature
     const decoded = jwt.verify(incomingRefreshToken, process.env.REFRESH_TOKEN_SECRET);
 
-    // Find user and check token matches DB (blocks reuse of stolen tokens)
-    const user = await UserModel.findById(decoded.id);
-    if (!user || user.refreshToken !== incomingRefreshToken) {
-        throw new ApiError(401, "Refresh token is invalid or has expired");
+    // Find the session that holds this refresh token
+    const session = await SessionModel.findOne({
+        userId: decoded.id,
+        refreshToken: incomingRefreshToken,
+    });
+
+    if (!session) {
+        throw new ApiError(401, "Refresh token is invalid or session has expired");
     }
 
-    // Rotate both tokens
-    const { accessToken, refreshToken } = await user.generateToken();
+    const user = await UserModel.findById(decoded.id);
+    if (!user) {
+        throw new ApiError(401, "User not found");
+    }
 
-    const cookieOptions = {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
-        sameSite: "Lax",
-    };
+    // Rotate: generate new tokens and update the session
+    const accessToken = user.generateAccessToken();
+    const refreshToken = user.generateRefreshAccessToken();
+
+    session.refreshToken = refreshToken;
+    session.expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000); // Reset TTL
+    await session.save();
+
+    const options = cookieOptions(req);
 
     return res
         .cookie("accessToken", accessToken, {
-            ...cookieOptions,
+            ...options,
             maxAge: 15 * 60 * 1000
         })
         .cookie("refreshToken", refreshToken, {
-            ...cookieOptions,
+            ...options,
             maxAge: 7 * 24 * 60 * 60 * 1000
         })
         .status(200)
         .json(new ApiResponce(200, {}, "Access token refreshed"));
 })
 
-const changePassword = asyncHandler(async (req, res) => {
-    const { email, password } = req.body;
+// ─────────────────────────────────────────────────
+// POST /auth/logout
+// Deletes only the current device's session
+// Other devices remain logged in
+// ─────────────────────────────────────────────────
+const logoutUser = asyncHandler(async (req, res) => {
+    const incomingRefreshToken = req.cookies?.refreshToken;
 
-    if (!email || !password) {
-        throw new ApiError(400, "Email and password are required");
+    if (incomingRefreshToken) {
+        // Delete the session matching this refresh token
+        await SessionModel.findOneAndDelete({
+            userId: req.user._id,
+            refreshToken: incomingRefreshToken,
+        });
     }
 
-    const user = await UserModel.findOne({ email });
-    if (!user) throw new ApiError(404, "No account found with this email");
-
-    // Hash and save new password
-    user.password = await bcrypt.hash(password, 10);
-
-    
-    // Generate tokens (also saves refreshToken to DB internally)
-    const { accessToken, refreshToken } = await user.generateToken();
-
-    const cookieOptions = {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
-        sameSite: "Lax",
-    };
+    const options = cookieOptions(req);
 
     return res
-        .cookie("accessToken", accessToken, {
-            ...cookieOptions,
-            maxAge: 15 * 60 * 1000
-        })
-        .cookie("refreshToken", refreshToken, {
-            ...cookieOptions,
-            maxAge: 7 * 24 * 60 * 60 * 1000
-        })
+        .clearCookie("accessToken", options)
+        .clearCookie("refreshToken", options)
         .status(200)
-        .json(new ApiResponce(200, {}, "Password changed successfully"));
+        .json(new ApiResponce(200, {}, "Logged out successfully"));
 })
 
-export { registerUser, loginUser, refreshAccessToken, changePassword }
+// ─────────────────────────────────────────────────
+// POST /auth/logout-all
+// Deletes ALL sessions for the user across every device
+// ─────────────────────────────────────────────────
+const logoutAllDevices = asyncHandler(async (req, res) => {
+    // Wipe all sessions belonging to this user
+    await SessionModel.deleteMany({ userId: req.user._id });
+
+    const options = cookieOptions(req);
+
+    return res
+        .clearCookie("accessToken", options)
+        .clearCookie("refreshToken", options)
+        .status(200)
+        .json(new ApiResponce(200, {}, "Logged out from all devices"));
+})
+
+// ─────────────────────────────────────────────────
+// GET /auth/me
+// Returns the currently authenticated user
+// Used by frontend to persist login across page refreshes
+// ─────────────────────────────────────────────────
+const getCurrentUser = asyncHandler(async (req, res) => {
+    return res.status(200).json(
+        new ApiResponce(200, { user: req.user }, "User fetched successfully")
+    );
+})
+
+export {
+    registerUser,
+    loginUser,
+    refreshAccessToken,
+    logoutUser,
+    logoutAllDevices,
+    getCurrentUser,
+}

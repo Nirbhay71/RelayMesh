@@ -4,12 +4,14 @@ import cookieParser from "cookie-parser";
 import passport from "./auth/google.auth.js";
 import { AuthRouter } from "./routes/auth.routes.js";
 import { OTPRouter } from "./routes/OTP.routes.js";
+import { ContactRouter } from "./routes/contact.routes.js";
+import { MessageRouter } from "./routes/message.routes.js";
 
 const app = express();
 
 // Middlewares
 app.use(cors({
-    origin: process.env.CORS_ORIGIN || "http://localhost:5173",
+    origin: process.env.CORS_ORIGIN || ["http://localhost:5173", "http://localhost:5174", "http://192.168.1.7:5173", "http://192.168.1.7:5174"],
     credentials: true,
     methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"]
@@ -26,5 +28,7 @@ app.use(passport.initialize());
 // GET /auth/google/callback → generate JWT cookies + redirect to dashboard
 app.use("/auth", AuthRouter);
 app.use("/otp", OTPRouter);
+app.use("/contacts", ContactRouter);
+app.use("/messages", MessageRouter);
 
 export { app }

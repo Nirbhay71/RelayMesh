@@ -6,13 +6,13 @@ import { initializeSocket } from "./socket.js";
 
 dotenv.config();
 
-const port = process.env.PORT || 5000;
+const port = process.env.PORT || 7100;
 
 // Initialize HTTP server and Socket.io
 const server = createServer(app);
 const io = initializeSocket(server);
 
-// Environment are not loading ..........
+// DB Configuration
 let DB_URL = process.env.MONGODB_URI || "mongodb://localhost:27017/RelayMesh";
 if (DB_URL && DB_URL.endsWith("/")) {
     DB_URL = DB_URL.slice(0, -1);
@@ -34,3 +34,15 @@ connectDB(DB_URL)
     });
 
 export { io };
+
+// Graceful shutdown — required for nodemon restarts
+// const shutdown = (signal) => {
+//     console.log(`\n${signal} received. Shutting down gracefully...`);
+//     server.close(() => {
+//         console.log("HTTP server closed.");
+//         process.exit(0);
+//     });
+// };
+
+// process.on("SIGTERM", () => shutdown("SIGTERM"));
+// process.on("SIGINT", () => shutdown("SIGINT"));

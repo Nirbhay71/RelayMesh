@@ -22,7 +22,7 @@ const Login = () => {
     };
 
     const handleGoogleLogin = () => {
-        window.location.href = 'http://localhost:7100/auth/google';
+        window.location.href = `http://${window.location.hostname}:${import.meta.env.VITE_API_PORT || 7100}/auth/google`;
     };
 
     return (
@@ -56,6 +56,12 @@ const Login = () => {
                         onChange={(e) => setPassword(e.target.value)}
                         required
                     />
+                </div>
+
+                <div className="flex justify-end pr-1">
+                    <Link to="/forgot-password" virtual-link="true" className="text-xs text-blue-400/80 hover:text-blue-400 transition-colors">
+                        Forgot Password?
+                    </Link>
                 </div>
 
                 <button

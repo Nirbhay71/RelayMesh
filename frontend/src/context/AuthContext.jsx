@@ -1,18 +1,19 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
 import axios from "axios";
 
+const API_BASE = `http://${window.location.hostname}:${import.meta.env.VITE_API_PORT || 7100}`;
+
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
     const [user, setUser] = useState(null);
     const [loading, setLoading] = useState(true);
 
+    // Check if user is authenticated on page load / refresh
     const checkAuthStatus = async () => {
         try {
-            // Placeholder: Backend might need a /auth/me or similar endpoint
-            // For now, we assume user is logged in if we can get a response
-            // const response = await axios.get("http://localhost:7100/auth/me");
-            // setUser(response.data.user);
+            const response = await axios.get(`${API_BASE}/auth/me`, { withCredentials: true });
+            setUser(response.data.data.user);
         } catch (error) {
             setUser(null);
         } finally {
@@ -25,18 +26,23 @@ export const AuthProvider = ({ children }) => {
     }, []);
 
     const login = async (email, password) => {
-        const response = await axios.post("http://localhost:7100/auth/login", { email, password }, { withCredentials: true });
+        const response = await axios.post(`${API_BASE}/auth/login`, { email, password }, { withCredentials: true });
         setUser(response.data.data.user);
         return response.data;
     };
 
     const register = async (username, email, password) => {
-        const response = await axios.post("http://localhost:7100/auth/register", { username, email, password }, { withCredentials: true });
+        const response = await axios.post(`${API_BASE}/auth/register`, { username, email, password }, { withCredentials: true });
         return response.data;
     };
 
     const logout = async () => {
-        // Implement backend logout if available
+        try {
+            await axios.post(`${API_BASE}/auth/logout`, {}, { withCredentials: true });
+        } catch (error) {
+            // Even if logout API fails, clear local state
+            console.error("Logout error:", error);
+        }
         setUser(null);
     };
 

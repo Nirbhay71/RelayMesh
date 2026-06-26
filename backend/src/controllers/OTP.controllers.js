@@ -3,19 +3,26 @@ import { UserModel } from "../models/user.models.js"
 import { ApiError } from "../utils/ApiError.js"
 import { ApiResponce } from "../utils/ApiResponce.js"
 import { SendEmail } from "../utils/email.utils.js"
-import bcrypt from "bcryptjs"
+import { storeOTP, getOTP, deleteOTP } from "../utils/redis.utils.js"
+import { createSession } from "../utils/session.utils.js"
 
+/**
+ * Generate a 6-digit numeric OTP.
+ * Numeric-only as per the spec (e.g. 483921).
+ */
 const generateOTP = () => {
-    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-    let otp = '';
+    let otp = ""
     for (let i = 0; i < 6; i++) {
-        otp += chars[Math.floor(Math.random() * chars.length)];
+        otp += Math.floor(Math.random() * 10)
     }
-    return otp;
+    return otp
 }
 
+// ─────────────────────────────────────────────────
 // POST /otp/send
-// Sends OTP to the user's email for forgot password
+// Generates OTP, stores in Redis (300s TTL), emails to user
+// OTP is NEVER stored in MongoDB
+// ─────────────────────────────────────────────────
 const sendOTP = asyncHandler(async (req, res) => {
     const { email } = req.body;
 
@@ -24,23 +31,30 @@ const sendOTP = asyncHandler(async (req, res) => {
     const user = await UserModel.findOne({ email });
     if (!user) throw new ApiError(404, "No account found with this email");
 
+    // Block non-local users (e.g. Google OAuth) from resetting password
+    if (user.authType !== "local") {
+        throw new ApiError(403, `This account uses ${user.authType} login. Please sign in with ${user.authType} instead.`);
+    }
+
     const otp = generateOTP();
-    const message = `Your OTP for password reset is ${otp}. It expires in 2 minutes. Do not share this with anyone.`;
+    const message = `Your OTP for password reset is ${otp}. It expires in 5 minutes. Do not share this with anyone.`;
 
     const mailSend = await SendEmail(email, "Password Reset OTP", message);
     if (!mailSend) throw new ApiError(500, "Failed to send OTP");
 
-    user.otp = otp;
-    user.otpExpiry = Date.now() + 2 * 60 * 1000; // 2 minutes
-    await user.save({ validateBeforeSave: false });
+    // Store OTP in Redis with 300 second (5 minute) TTL — auto-expires
+    await storeOTP(email, otp);
 
     return res.status(200).json(
         new ApiResponce(200, {}, "OTP sent successfully")
     );
 })
 
+// ─────────────────────────────────────────────────
 // POST /otp/reset-password
-// Verifies OTP and changes password in one step
+// Verifies OTP from Redis and resets password in one step
+// Creates a new Session for auto-login after reset
+// ─────────────────────────────────────────────────
 const resetPassword = asyncHandler(async (req, res) => {
     const { email, otp, newPassword } = req.body;
 
@@ -51,17 +65,21 @@ const resetPassword = asyncHandler(async (req, res) => {
     const user = await UserModel.findOne({ email });
     if (!user) throw new ApiError(404, "No account found with this email");
 
-    // Check OTP
-    if (user.otp !== otp) throw new ApiError(400, "Invalid OTP");
-    if (user.otpExpiry < Date.now()) throw new ApiError(400, "OTP has expired");
+    // Retrieve OTP from Redis (returns null if expired or not found)
+    const storedOTP = await getOTP(email);
 
-    // Set new password and clear OTP
-    user.password = await bcrypt.hash(newPassword, 10);
-    user.otp = undefined;
-    user.otpExpiry = undefined;
+    if (!storedOTP) throw new ApiError(400, "OTP has expired or was not requested");
+    if (storedOTP !== otp) throw new ApiError(400, "Invalid OTP");
 
-    // Generate fresh tokens and log the user in
-    const { accessToken, refreshToken } = await user.generateToken();
+    // Set new password (pre-save hook will hash it)
+    user.password = newPassword;
+    await user.save();
+
+    // Clear the OTP from Redis after successful verification
+    await deleteOTP(email);
+
+    // Auto-login: create a session and return tokens
+    const { accessToken, refreshToken } = await createSession(user, req);
 
     const cookieOptions = {
         httpOnly: true,
