@@ -17,7 +17,7 @@ const ForgotPassword = () => {
         setError('');
         setMessage('');
         try {
-            await axios.post(`http://${window.location.hostname}:${import.meta.env.VITE_API_PORT || 7100}/otp/send`, { email });
+            await axios.post(`${import.meta.env.VITE_API_URL || 'http://localhost:7100'}/otp/send`, { email });
             setMessage("OTP sent to your email!");
             setTimeout(() => navigate(`/reset-password?email=${email}`), 2000);
         } catch (err) {

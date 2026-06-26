@@ -14,6 +14,10 @@ export const initializeSocket = (server) => {
     const pubClient = redis;
     const subClient = redis.duplicate();
 
+    subClient.on("error", (err) => {
+        console.error("Redis subClient error:", err.message);
+    });
+
     const io = new Server(server, {
         cors: {
             origin: process.env.CORS_ORIGIN || ["http://localhost:5173", "http://localhost:5174", "http://192.168.1.7:5173", "http://192.168.1.7:5174"],

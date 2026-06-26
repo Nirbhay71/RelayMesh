@@ -19,7 +19,7 @@ const ResetPassword = () => {
         setLoading(true);
         setError('');
         try {
-            await axios.post(`http://${window.location.hostname}:${import.meta.env.VITE_API_PORT || 7100}/otp/reset-password`, { email, otp, newPassword }, { withCredentials: true });
+            await axios.post(`${import.meta.env.VITE_API_URL || 'http://localhost:7100'}/otp/reset-password`, { email, otp, newPassword }, { withCredentials: true });
             setMessage("Password reset successfully! Redirecting...");
             setTimeout(() => navigate('/'), 2000);
         } catch (err) {

@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { X, UserPlus, Mail, User, Loader2 } from 'lucide-react';
 import axios from 'axios';
 
-const API_BASE = `http://${window.location.hostname}:${import.meta.env.VITE_API_PORT || 7100}`;
+const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:7100";
 
 const AddContactModal = ({ isOpen, onClose, onContactAdded }) => {
     const [username, setUsername] = useState('');

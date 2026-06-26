@@ -22,7 +22,7 @@ const Login = () => {
     };
 
     const handleGoogleLogin = () => {
-        window.location.href = `http://${window.location.hostname}:${import.meta.env.VITE_API_PORT || 7100}/auth/google`;
+        window.location.href = `${import.meta.env.VITE_API_URL || 'http://localhost:7100'}/auth/google`;
     };
 
     return (
