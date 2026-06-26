@@ -13,11 +13,14 @@ import jwt from "jsonwebtoken"
  * secure: HTTPS only in production
  * sameSite: CSRF protection
  */
-const cookieOptions = (req) => ({
-    httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
-    sameSite: "None",
-})
+const cookieOptions = (req) => {
+    const isProd = process.env.NODE_ENV === "production";
+    return {
+        httpOnly: true,
+        secure: isProd,
+        sameSite: isProd ? "None" : "Lax",
+    };
+};
 
 // ─────────────────────────────────────────────────
 // POST /auth/register

@@ -24,10 +24,11 @@ AuthRouter.get("/google/callback",
         // Create session with device metadata from the request
         const { accessToken, refreshToken } = await createSession(req.user, req);
 
+        const isProd = process.env.NODE_ENV === "production";
         const cookieOptions = {
             httpOnly: true,
-            secure: process.env.NODE_ENV === "production",
-            sameSite: "None",
+            secure: isProd,
+            sameSite: isProd ? "None" : "Lax",
         };
 
         res
