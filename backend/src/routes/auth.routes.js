@@ -39,7 +39,7 @@ AuthRouter.get("/google/callback",
                 ...cookieOptions,
                 maxAge: 7 * 24 * 60 * 60 * 1000  // 7 days
             })
-            .redirect(process.env.CORS_ORIGIN || "https://relay-mesh-git-main-nirbhay71s-projects.vercel.app/")
+            .redirect(process.env.CORS_ORIGIN || "https://relay-mesh.vercel.app/")
     }
 )
 
