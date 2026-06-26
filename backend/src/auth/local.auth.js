@@ -16,7 +16,7 @@ import jwt from "jsonwebtoken"
 const cookieOptions = (req) => ({
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
-    sameSite: "Lax",
+    sameSite: "None",
 })
 
 // ─────────────────────────────────────────────────
