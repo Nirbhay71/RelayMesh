@@ -1,4 +1,4 @@
-import Redis from "ioredis"
+import { Redis } from '@upstash/redis'
 
 /**
  * Redis Client
@@ -10,12 +10,12 @@ import Redis from "ioredis"
  *   - Rate limiting (key: login:{email}, TTL: 900s)
  *   - Socket.IO Redis Adapter (pub/sub for horizontal scaling)
  * 
- * Requires REDIS_URL in .env (defaults to redis://localhost:6379)
+ * Requires UPSTASH_REDIS_REST_URL and UPSTASH_REDIS_REST_TOKEN in .env
  */
-const redis = new Redis(process.env.REDIS_URL || "redis://localhost:6379")
-
-redis.on("connect", () => console.log("Redis connected successfully"))
-redis.on("error", (err) => console.error("Redis connection error:", err.message))
+const redis = new Redis({
+  url: process.env.UPSTASH_REDIS_REST_URL || 'https://good-swan-110004.upstash.io',
+  token: process.env.UPSTASH_REDIS_REST_TOKEN || 'gQAAAAAAAa20AAIgcDIxMzA3YWI5OTcwYTQ0YTI0YWU4NThiODQ2YzgzNThlMg',
+})
 
 // ─────────────────────────────────────────────────
 // OTP Helpers
