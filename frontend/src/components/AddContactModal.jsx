@@ -79,13 +79,13 @@ const AddContactModal = ({ isOpen, onClose, onContactAdded }) => {
                         animate={{ opacity: 1, scale: 1, y: 0 }}
                         exit={{ opacity: 0, scale: 0.95, y: 20 }}
                         transition={{ duration: 0.2 }}
-                        className="w-full max-w-md bg-[#1a1a2e] border border-white/10 rounded-2xl shadow-2xl overflow-hidden"
+                        className="w-full max-w-md bg-[#111116] border border-white/[0.08] rounded-2xl shadow-2xl overflow-hidden"
                         onClick={(e) => e.stopPropagation()}
                     >
                         {/* Header */}
-                        <div className="flex items-center justify-between px-6 py-4 border-b border-white/10">
+                        <div className="flex items-center justify-between px-6 py-4 border-b border-white/[0.07]">
                             <div className="flex items-center gap-3">
-                                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center">
+                                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 to-violet-600 flex items-center justify-center">
                                     <UserPlus className="w-5 h-5 text-white" />
                                 </div>
                                 <div>
@@ -113,44 +113,52 @@ const AddContactModal = ({ isOpen, onClose, onContactAdded }) => {
                                 </motion.div>
                             )}
 
-                            <div className="relative">
-                                <User className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
-                                <input
-                                    type="text"
-                                    placeholder="Username"
-                                    className="w-full bg-white/5 border border-white/10 rounded-xl py-3 pl-10 pr-4 text-white focus:outline-none focus:ring-2 focus:ring-blue-500/50 transition-all font-light placeholder:text-gray-500"
-                                    value={username}
-                                    onChange={(e) => setUsername(e.target.value)}
-                                    autoFocus
-                                />
-                            </div>
+                            <input
+                                type="text"
+                                placeholder="Username"
+                                style={{
+                                    width:'100%', background:'rgba(255,255,255,0.04)',
+                                    border:'1px solid rgba(255,255,255,0.09)', borderRadius:'0.875rem',
+                                    padding:'0.8rem 1rem', color:'#fff', fontSize:'0.875rem',
+                                    fontWeight:300, outline:'none'
+                                }}
+                                value={username}
+                                onChange={(e) => setUsername(e.target.value)}
+                                autoFocus
+                            />
 
-                            <div className="relative">
-                                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
-                                <input
-                                    type="email"
-                                    placeholder="Email Address"
-                                    className="w-full bg-white/5 border border-white/10 rounded-xl py-3 pl-10 pr-4 text-white focus:outline-none focus:ring-2 focus:ring-blue-500/50 transition-all font-light placeholder:text-gray-500"
-                                    value={email}
-                                    onChange={(e) => setEmail(e.target.value)}
-                                />
-                            </div>
+                            <input
+                                type="email"
+                                placeholder="Email address"
+                                style={{
+                                    width:'100%', background:'rgba(255,255,255,0.04)',
+                                    border:'1px solid rgba(255,255,255,0.09)', borderRadius:'0.875rem',
+                                    padding:'0.8rem 1rem', color:'#fff', fontSize:'0.875rem',
+                                    fontWeight:300, outline:'none'
+                                }}
+                                value={email}
+                                onChange={(e) => setEmail(e.target.value)}
+                            />
 
                             <button
                                 type="submit"
                                 disabled={loading}
-                                className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 disabled:opacity-50 disabled:cursor-not-allowed text-white font-semibold py-3 rounded-xl shadow-lg shadow-blue-500/25 transition-all flex items-center justify-center gap-2"
+                                style={{
+                                    width:'100%', background:'rgba(99,102,241,0.85)',
+                                    border:'none', borderRadius:'0.875rem',
+                                    padding:'0.8rem 1rem', color:'#fff',
+                                    fontWeight:500, fontSize:'0.875rem',
+                                    cursor: loading ? 'not-allowed' : 'pointer',
+                                    opacity: loading ? 0.5 : 1,
+                                    display:'flex', alignItems:'center',
+                                    justifyContent:'center', gap:'0.5rem',
+                                    transition:'background 0.2s'
+                                }}
                             >
                                 {loading ? (
-                                    <>
-                                        <Loader2 className="w-4 h-4 animate-spin" />
-                                        Searching...
-                                    </>
+                                    <><Loader2 className="w-4 h-4 animate-spin" /> Searching...</>
                                 ) : (
-                                    <>
-                                        <UserPlus className="w-4 h-4" />
-                                        Add Contact
-                                    </>
+                                    <><UserPlus className="w-4 h-4" /> Add Contact</>
                                 )}
                             </button>
                         </form>

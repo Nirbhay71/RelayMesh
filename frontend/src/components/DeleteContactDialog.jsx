@@ -18,7 +18,7 @@ const DeleteContactDialog = ({ isOpen, onClose, onConfirm, contactName }) => {
                         animate={{ opacity: 1, scale: 1, y: 0 }}
                         exit={{ opacity: 0, scale: 0.95, y: 20 }}
                         transition={{ duration: 0.2 }}
-                        className="w-full max-w-sm bg-[#1a1a2e] border border-white/10 rounded-2xl shadow-2xl overflow-hidden"
+                        className="w-full max-w-sm bg-[#111116] border border-white/[0.08] rounded-2xl shadow-2xl overflow-hidden"
                         onClick={(e) => e.stopPropagation()}
                     >
                         <div className="p-6 text-center">

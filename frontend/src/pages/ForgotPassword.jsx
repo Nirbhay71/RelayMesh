@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+﻿import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import AuthLayout from '../layouts/AuthLayout';
@@ -60,13 +60,13 @@ const ForgotPassword = () => {
                 <button
                     type="submit"
                     disabled={loading}
-                    className="auth-pill-btn auth-pill-btn--primary group disabled:opacity-50"
+                    className="auth-pill-btn group disabled:opacity-50"
                     id="forgot-submit-btn"
                 >
                     <span className="text-white font-medium text-sm">
                         {loading ? 'Sending OTP...' : 'Send OTP'}
                     </span>
-                    <div className="auth-pill-badge auth-pill-badge--primary">
+                    <div className="auth-pill-badge">
                         <ArrowRight className="w-3.5 h-3.5 text-white group-hover:translate-x-0.5 transition-transform" />
                     </div>
                 </button>

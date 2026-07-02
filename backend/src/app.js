@@ -9,9 +9,28 @@ import { MessageRouter } from "./routes/message.routes.js";
 
 const app = express();
 
-// Middlewares
+// Build the allowed origins list.
+// CORS_ORIGIN in .env can be a single URL or comma-separated list of URLs.
+// A wildcard "*" cannot be used with credentials:true, so we fall back to dev defaults.
+const rawOrigins = process.env.CORS_ORIGIN || "";
+const devDefaults = [
+    "http://localhost:5173",
+    "http://localhost:5174",
+    "http://192.168.1.7:5173",
+    "http://192.168.1.7:5174",
+];
+const allowedOrigins =
+    !rawOrigins || rawOrigins === "*"
+        ? devDefaults
+        : rawOrigins.split(",").map((o) => o.trim()).filter(Boolean);
+
 app.use(cors({
-    origin: process.env.CORS_ORIGIN || ["http://localhost:5173", "http://localhost:5174", "http://192.168.1.7:5173", "http://192.168.1.7:5174"],
+    origin: (origin, callback) => {
+        // Allow requests with no origin (e.g. curl, Postman, server-to-server)
+        if (!origin) return callback(null, true);
+        if (allowedOrigins.includes(origin)) return callback(null, true);
+        callback(new Error(`CORS: origin '${origin}' not allowed`));
+    },
     credentials: true,
     methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"]

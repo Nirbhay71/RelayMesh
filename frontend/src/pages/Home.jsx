@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+﻿import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '../context/AuthContext';
 import AddContactModal from '../components/AddContactModal';
@@ -475,9 +475,9 @@ const Home = () => {
     };
 
     return (
-        <div className="h-screen w-full flex bg-[#050505] overflow-hidden">
+        <div className="h-screen w-full flex bg-[#0c0c0c] overflow-hidden">
             {/* ── LEFT SIDEBAR ─────────────────────────────────── */}
-            <div className="w-[380px] min-w-[320px] border-r border-white/10 flex flex-col bg-[#0a0a14]">
+            <div className="w-[380px] min-w-[320px] border-r border-white/10 flex flex-col bg-[#0f0f14]">
                 <div className="px-4 py-3 border-b border-white/10 flex items-center justify-between">
                     <div className="flex items-center gap-3">
                         <div className={`w-10 h-10 rounded-full bg-gradient-to-br ${getAvatarColor(user?.username)} flex items-center justify-center text-white font-bold text-sm shadow-lg`}>
@@ -490,7 +490,7 @@ const Home = () => {
                     </div>
                     <div className="flex items-center gap-1">
                         <button onClick={() => setShowAddModal(true)} className="w-9 h-9 rounded-lg hover:bg-white/10 flex items-center justify-center transition-colors group">
-                            <UserPlus className="w-4.5 h-4.5 text-gray-400 group-hover:text-blue-400 transition-colors" />
+                            <UserPlus className="w-4.5 h-4.5 text-gray-400 group-hover:text-indigo-400 transition-colors" />
                         </button>
                         <button onClick={logout} className="w-9 h-9 rounded-lg hover:bg-white/10 flex items-center justify-center transition-colors group">
                             <LogOut className="w-4.5 h-4.5 text-gray-400 group-hover:text-red-400 transition-colors" />
@@ -504,7 +504,7 @@ const Home = () => {
                         <input
                             type="text"
                             placeholder="Search contacts..."
-                            className="w-full bg-white/5 border border-white/5 rounded-xl py-2.5 pl-9 pr-4 text-white text-sm placeholder:text-gray-600 focus:outline-none focus:ring-1 focus:ring-blue-500/30 transition-all"
+                            className="w-full bg-white/[0.04] border border-white/[0.07] rounded-xl py-2.5 pl-9 pr-4 text-white text-sm placeholder:text-gray-600 focus:outline-none focus:border-white/[0.14] transition-all"
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
                         />
@@ -514,7 +514,7 @@ const Home = () => {
                 <div className="flex-1 overflow-y-auto custom-scrollbar">
                     {loadingContacts ? (
                         <div className="flex items-center justify-center py-20">
-                            <div className="w-8 h-8 border-3 border-blue-500/20 border-t-blue-500 rounded-full animate-spin"></div>
+                            <div className="w-8 h-8 border-2 border-indigo-500/20 border-t-indigo-500 rounded-full animate-spin"></div>
                         </div>
                     ) : (
                         filteredContacts.map((contact) => {
@@ -525,14 +525,14 @@ const Home = () => {
                                     key={contact._id}
                                     onClick={() => setSelectedContact(contact)}
                                     className={`flex items-center gap-3 px-4 py-3 cursor-pointer transition-all border-b border-white/5 group
-                                        ${isSelected ? 'bg-blue-500/10 border-l-2 border-l-blue-500' : 'hover:bg-white/5 border-l-2 border-l-transparent'}`}
+                                        ${isSelected ? 'bg-indigo-500/[0.08] border-l-2 border-l-indigo-500/80' : 'hover:bg-white/5 border-l-2 border-l-transparent'}`}
                                 >
                                     <div className="relative">
                                         <div className={`w-11 h-11 rounded-full bg-gradient-to-br ${getAvatarColor(contactUser?.username)} flex items-center justify-center text-white font-bold text-sm shadow-md flex-shrink-0`}>
                                             {getInitials(contactUser?.username)}
                                         </div>
                                         {contactUser?.isOnline && (
-                                            <div className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 border-2 border-[#0a0a14] rounded-full shadow-lg" />
+                                            <div className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 border-2 border-[#0f0f14] rounded-full shadow-lg" />
                                         )}
                                     </div>
                                     <div className="flex-1 min-w-0">
@@ -550,10 +550,10 @@ const Home = () => {
             </div>
 
             {/* ── RIGHT PANEL (Chat Area) ──────────────────────── */}
-            <div className="flex-1 flex flex-col bg-[#050510]">
+            <div className="flex-1 flex flex-col bg-[#0c0c0c]">
                 {selectedContact ? (
                     <>
-                        <div className="px-6 py-3 border-b border-white/10 flex items-center justify-between bg-[#0a0a14]">
+                        <div className="px-6 py-3 border-b border-white/10 flex items-center justify-between bg-[#0f0f14]">
                             <div className="flex items-center gap-3">
                                 <div className={`w-10 h-10 rounded-full bg-gradient-to-br ${getAvatarColor(selectedContact.contact?.username)} flex items-center justify-center text-white font-bold text-sm shadow-md`}>
                                     {getInitials(selectedContact.contact?.username)}
@@ -589,7 +589,7 @@ const Home = () => {
                             {hasMore && conversationId && (
                                 <button
                                     onClick={loadMoreMessages}
-                                    className="w-full py-2 text-blue-400 text-xs hover:underline flex items-center justify-center gap-1"
+                                    className="w-full py-2 text-indigo-400/70 text-xs hover:text-indigo-400 flex items-center justify-center gap-1"
                                 >
                                     <ChevronDown className="w-3 h-3 rotate-180" /> Load older messages
                                 </button>
@@ -606,7 +606,7 @@ const Home = () => {
                                 return (
                                     <div key={msg._id || idx} className={`flex ${isMe ? 'justify-end' : 'justify-start'}`}>
                                         <div className={`max-w-[70%] rounded-2xl px-4 py-2 shadow-lg ${isMe
-                                            ? 'bg-blue-600 text-white rounded-tr-none'
+                                            ? 'bg-indigo-600 text-white rounded-tr-sm'
                                             : 'bg-white/10 text-gray-100 rounded-tl-none'
                                             }`}>
                                             <p className="text-sm font-light leading-relaxed">{msg.content}</p>
@@ -633,18 +633,18 @@ const Home = () => {
                             <div ref={messagesEndRef} />
                         </div>
 
-                        <form onSubmit={handleSendMessage} className="px-4 py-3 border-t border-white/10 bg-[#0a0a14]">
+                        <form onSubmit={handleSendMessage} className="px-4 py-3 border-t border-white/10 bg-[#0f0f14]">
                             <div className="flex items-center gap-3">
                                 <input
                                     type="text"
                                     placeholder="Type a message..."
-                                    className="flex-1 bg-white/5 border border-white/10 rounded-xl py-2.5 px-4 text-white text-sm focus:outline-none focus:ring-1 focus:ring-blue-500/50"
+                                    className="flex-1 bg-white/[0.04] border border-white/[0.08] rounded-xl py-2.5 px-4 text-white text-sm focus:outline-none focus:border-white/[0.16] transition-all font-light"
                                     value={newMessage}
                                     onChange={handleTyping}
                                 />
                                 <button
                                     type="submit"
-                                    className="w-10 h-10 rounded-xl bg-gradient-to-r from-blue-600 to-purple-600 flex items-center justify-center shadow-lg hover:brightness-110 transition-all"
+                                    className="w-10 h-10 rounded-xl bg-gradient-to-r from-indigo-600 to-violet-600 flex items-center justify-center shadow-lg hover:brightness-110 transition-all"
                                 >
                                     <Send className="w-4 h-4 text-white" />
                                 </button>
@@ -654,10 +654,10 @@ const Home = () => {
                 ) : (
                     <div className="flex-1 flex items-center justify-center">
                         <div className="text-center">
-                            <div className="w-24 h-24 rounded-3xl bg-gradient-to-br from-blue-500/10 to-purple-500/10 border border-white/10 flex items-center justify-center mx-auto mb-6">
-                                <MessageSquare className="w-12 h-12 text-blue-400/30" />
+                            <div className="w-24 h-24 rounded-3xl bg-gradient-to-br from-indigo-500/10 to-violet-500/10 border border-white/10 flex items-center justify-center mx-auto mb-6">
+                                <MessageSquare className="w-12 h-12 text-indigo-400/30" />
                             </div>
-                            <h2 className="text-2xl font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent mb-2">RelayMesh</h2>
+                            <h2 className="text-2xl font-bold bg-gradient-to-r from-indigo-400 to-violet-400 bg-clip-text text-transparent mb-2">RelayMesh</h2>
                             <p className="text-gray-500 text-sm">Select a contact to start chatting</p>
                         </div>
                     </div>
