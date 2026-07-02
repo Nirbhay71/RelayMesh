@@ -28,43 +28,56 @@ const ForgotPassword = () => {
     };
 
     return (
-        <AuthLayout title="Forgot Password" subtitle="Enter your email to receive a recovery OTP">
-            <form onSubmit={handleSubmit} className="space-y-4">
+        <AuthLayout
+            tagline={<>Recover your<br />account access.</>}
+            subtitle="Enter your email and we'll send you a recovery OTP."
+        >
+            <form onSubmit={handleSubmit} className="space-y-3">
                 {message && (
-                    <div className="bg-green-500/10 border border-green-500/20 text-green-400 p-3 rounded-lg text-sm text-center">
+                    <div className="bg-green-500/10 border border-green-500/20 text-green-400 p-3 rounded-xl text-sm text-center mb-2">
                         {message}
                     </div>
                 )}
                 {error && (
-                    <div className="bg-red-500/10 border border-red-500/20 text-red-400 p-3 rounded-lg text-sm text-center">
+                    <div className="bg-red-500/10 border border-red-500/20 text-red-400 p-3 rounded-xl text-sm text-center mb-2">
                         {error}
                     </div>
                 )}
 
                 <div className="relative">
-                    <Mail className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
+                    <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 w-4 h-4 pointer-events-none" />
                     <input
                         type="email"
-                        placeholder="Email Address"
-                        className="w-full bg-white/5 border border-white/10 rounded-xl py-3 pl-10 pr-4 text-white focus:outline-none focus:ring-2 focus:ring-blue-500/50 transition-all font-light"
+                        placeholder="Email address"
+                        className="auth-input pl-11"
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
                         required
+                        id="forgot-email"
                     />
                 </div>
 
                 <button
                     type="submit"
                     disabled={loading}
-                    className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-semibold py-3 rounded-xl shadow-lg shadow-blue-500/25 transition-all flex items-center justify-center gap-2 group disabled:opacity-50"
+                    className="auth-pill-btn auth-pill-btn--primary group disabled:opacity-50"
+                    id="forgot-submit-btn"
                 >
-                    {loading ? 'Sending...' : 'Send OTP'} <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                    <span className="text-white font-medium text-sm">
+                        {loading ? 'Sending OTP...' : 'Send OTP'}
+                    </span>
+                    <div className="auth-pill-badge auth-pill-badge--primary">
+                        <ArrowRight className="w-3.5 h-3.5 text-white group-hover:translate-x-0.5 transition-transform" />
+                    </div>
                 </button>
-
-                <p className="text-center text-gray-500 text-sm mt-6">
-                    Remember your password? <Link to="/login" className="text-blue-400 hover:text-blue-300 font-medium">Sign in</Link>
-                </p>
             </form>
+
+            <p className="text-gray-600 text-sm mt-6">
+                Remember your password?{' '}
+                <Link to="/login" className="text-gray-300 hover:text-white font-medium transition-colors">
+                    Sign in
+                </Link>
+            </p>
         </AuthLayout>
     );
 };

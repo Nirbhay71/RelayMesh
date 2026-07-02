@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import AuthLayout from '../layouts/AuthLayout';
-import { UserPlus, Mail, Lock, User } from 'lucide-react';
+import { ArrowRight, Mail, User } from 'lucide-react';
 
 const Register = () => {
     const [username, setUsername] = useState('');
@@ -23,61 +23,81 @@ const Register = () => {
     };
 
     return (
-        <AuthLayout title="Get Started" subtitle="Create your secure account and join RelayMesh">
-            <form onSubmit={handleSubmit} className="space-y-4">
+        <AuthLayout
+            tagline={<>Start messaging<br />with RelayMesh.</>}
+            subtitle="Create your free account and connect instantly."
+        >
+            <form onSubmit={handleSubmit} className="space-y-3">
                 {error && (
-                    <div className="bg-red-500/10 border border-red-500/20 text-red-400 p-3 rounded-lg text-sm text-center">
+                    <div className="bg-red-500/10 border border-red-500/20 text-red-400 p-3 rounded-xl text-sm text-center mb-2">
                         {error}
                     </div>
                 )}
 
                 <div className="relative">
-                    <User className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
+                    <User className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 w-4 h-4 pointer-events-none" />
                     <input
                         type="text"
                         placeholder="Username"
-                        className="w-full bg-white/5 border border-white/10 rounded-xl py-3 pl-10 pr-4 text-white focus:outline-none focus:ring-2 focus:ring-blue-500/50 transition-all font-light"
+                        className="auth-input pl-11"
                         value={username}
                         onChange={(e) => setUsername(e.target.value)}
                         required
+                        id="register-username"
                     />
                 </div>
 
                 <div className="relative">
-                    <Mail className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
+                    <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 w-4 h-4 pointer-events-none" />
                     <input
                         type="email"
-                        placeholder="Email Address"
-                        className="w-full bg-white/5 border border-white/10 rounded-xl py-3 pl-10 pr-4 text-white focus:outline-none focus:ring-2 focus:ring-blue-500/50 transition-all font-light"
+                        placeholder="Email address"
+                        className="auth-input pl-11"
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
                         required
+                        id="register-email"
                     />
                 </div>
 
-                <div className="relative">
-                    <Lock className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
-                    <input
-                        type="password"
-                        placeholder="Password"
-                        className="w-full bg-white/5 border border-white/10 rounded-xl py-3 pl-10 pr-4 text-white focus:outline-none focus:ring-2 focus:ring-blue-500/50 transition-all font-light"
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                        required
-                    />
+                <input
+                    type="password"
+                    placeholder="Password"
+                    className="auth-input"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    required
+                    id="register-password"
+                />
+
+                <div className="pt-1">
+                    <button
+                        type="submit"
+                        className="auth-pill-btn auth-pill-btn--primary group"
+                        id="register-submit-btn"
+                    >
+                        <span className="text-white font-medium text-sm">Create Account</span>
+                        <div className="auth-pill-badge auth-pill-badge--primary">
+                            <ArrowRight className="w-3.5 h-3.5 text-white group-hover:translate-x-0.5 transition-transform" />
+                        </div>
+                    </button>
                 </div>
-
-                <button
-                    type="submit"
-                    className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-semibold py-3 rounded-xl shadow-lg shadow-blue-500/25 transition-all flex items-center justify-center gap-2 group mt-6"
-                >
-                    Create Account <UserPlus className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-                </button>
-
-                <p className="text-center text-gray-500 text-sm mt-6">
-                    Already have an account? <Link to="/login" className="text-blue-400 hover:text-blue-300 font-medium">Sign in</Link>
-                </p>
             </form>
+
+            {/* Terms */}
+            <p className="text-gray-600 text-[11px] mt-6 leading-relaxed">
+                By creating an account, you agree to RelayMesh's{' '}
+                <span className="text-gray-400 hover:text-gray-200 cursor-pointer transition-colors">Terms of Service</span>
+                {' '}and{' '}
+                <span className="text-gray-400 hover:text-gray-200 cursor-pointer transition-colors">Privacy Policy</span>.
+            </p>
+
+            <p className="text-gray-600 text-sm mt-5">
+                Already have an account?{' '}
+                <Link to="/login" className="text-gray-300 hover:text-white font-medium transition-colors">
+                    Sign in
+                </Link>
+            </p>
         </AuthLayout>
     );
 };

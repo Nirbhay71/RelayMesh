@@ -2,12 +2,14 @@
 @tailwind components;
 @tailwind utilities;
 
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+
 :root {
   font-family: 'Inter', system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;
   font-weight: 400;
-  color: #213547;
-  background-color: #ffffff;
+  color: #ffffff;
+  background-color: #0c0c0c;
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
@@ -17,14 +19,86 @@
 body {
   margin: 0;
   overflow-x: hidden;
-  background: #050505;
+  background: #0c0c0c;
 }
 
 #root {
   width: 100%;
 }
 
-/* Custom scrollbar for dark theme */
+/* ─── Auth Component System ──────────────────────────── */
+
+/* Pill button — default (dark matte) */
+.auth-pill-btn {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.10);
+  border-radius: 1rem;
+  padding: 0.875rem 1rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.auth-pill-btn:hover {
+  background: rgba(255, 255, 255, 0.10);
+}
+
+/* Pill button — primary (submit) */
+.auth-pill-btn--primary {
+  background: rgba(255, 255, 255, 0.07);
+  border-color: rgba(255, 255, 255, 0.14);
+}
+
+.auth-pill-btn--primary:hover {
+  background: rgba(255, 255, 255, 0.12);
+}
+
+/* Badge on right side of pill button */
+.auth-pill-badge {
+  width: 1.75rem;
+  height: 1.75rem;
+  border-radius: 0.625rem;
+  background: rgba(255, 255, 255, 0.10);
+  border: 1px solid rgba(255, 255, 255, 0.10);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+/* Badge — primary variant */
+.auth-pill-badge--primary {
+  background: rgba(99, 102, 241, 0.75);
+  border-color: rgba(99, 102, 241, 0.45);
+}
+
+/* Input field */
+.auth-input {
+  width: 100%;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  border-radius: 1rem;
+  padding: 0.875rem 1rem;
+  color: #fff;
+  font-size: 0.875rem;
+  font-weight: 300;
+  outline: none;
+  transition: all 0.2s ease;
+}
+
+.auth-input::placeholder {
+  color: rgba(156, 163, 175, 0.5);
+}
+
+.auth-input:focus {
+  border-color: rgba(255, 255, 255, 0.18);
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.08);
+}
+
+/* ─── Custom scrollbar ───────────────────────────────── */
 .custom-scrollbar::-webkit-scrollbar {
   width: 6px;
 }
@@ -34,10 +108,10 @@ body {
 }
 
 .custom-scrollbar::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.08);
   border-radius: 3px;
 }
 
 .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-  background: rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.16);
 }
