@@ -1,0 +1,24 @@
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+  external_labels:
+    cluster: 'relaymesh'
+    environment: 'development'
+
+scrape_configs:
+  - job_name: 'relaymesh-backend'
+    static_configs:
+      - targets: ['host.docker.internal:7100']
+    metrics_path: '/metrics'
+    scrape_interval: 10s
+    scrape_timeout: 5s
+    relabel_configs:
+      - source_labels: [__address__]
+        target_label: instance
+
+  - job_name: 'relaymesh-local'
+    static_configs:
+      - targets: ['localhost:7100']
+    metrics_path: '/metrics'
+    scrape_interval: 10s
+    scrape_timeout: 5s
