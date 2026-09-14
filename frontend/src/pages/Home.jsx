@@ -15,6 +15,7 @@ import {
     Send,
     Users,
     ChevronDown,
+    ArrowLeft,
     Check,
     CheckCheck,
 } from 'lucide-react';
@@ -480,9 +481,9 @@ const Home = () => {
     };
 
     return (
-        <div className="h-screen w-full flex bg-[#0c0c0c] overflow-hidden">
+        <div className="h-[100dvh] w-full flex bg-[#0c0c0c] overflow-hidden">
             {/* ── LEFT SIDEBAR ─────────────────────────────────── */}
-            <div className="w-[380px] min-w-[320px] border-r border-white/10 flex flex-col bg-[#0f0f14]">
+            <div className={`w-full md:w-[380px] md:min-w-[320px] border-r border-white/10 flex-col bg-[#0f0f14] ${selectedContact ? 'hidden md:flex' : 'flex'}`}>
                 <div className="px-4 py-3 border-b border-white/10 flex items-center justify-between">
                     <div className="flex items-center gap-3">
                         <div className={`w-10 h-10 rounded-full bg-gradient-to-br ${getAvatarColor(user?.username)} flex items-center justify-center text-white font-bold text-sm shadow-lg`}>
@@ -509,7 +510,7 @@ const Home = () => {
                         <input
                             type="text"
                             placeholder="Search contacts..."
-                            className="w-full bg-white/[0.04] border border-white/[0.07] rounded-xl py-2.5 pl-9 pr-4 text-white text-sm placeholder:text-gray-600 focus:outline-none focus:border-white/[0.14] transition-all"
+                            className="w-full bg-white/[0.04] border border-white/[0.07] rounded-xl py-2.5 pl-9 pr-4 text-white text-base sm:text-sm placeholder:text-gray-600 focus:outline-none focus:border-white/[0.14] transition-all"
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
                         />
@@ -556,12 +557,18 @@ const Home = () => {
             </div>
 
             {/* ── RIGHT PANEL (Chat Area) ──────────────────────── */}
-            <div className="flex-1 flex flex-col bg-[#0c0c0c]">
+            <div className={`flex-1 flex-col bg-[#0c0c0c] min-w-0 ${selectedContact ? 'flex' : 'hidden md:flex'}`}>
                 {selectedContact ? (
                     <>
-                        <div className="px-6 py-3 border-b border-white/10 flex items-center justify-between bg-[#0f0f14]">
-                            <div className="flex items-center gap-3">
-                                <div className={`w-10 h-10 rounded-full bg-gradient-to-br ${getAvatarColor(selectedContact.contact?.username)} flex items-center justify-center text-white font-bold text-sm shadow-md`}>
+                        <div className="px-3 sm:px-6 py-3 border-b border-white/10 flex items-center justify-between bg-[#0f0f14]">
+                            <div className="flex items-center gap-2 sm:gap-3 min-w-0">
+                                <button
+                                    onClick={() => setSelectedContact(null)}
+                                    className="md:hidden w-9 h-9 -ml-1 rounded-lg hover:bg-white/10 flex items-center justify-center transition-colors flex-shrink-0"
+                                >
+                                    <ArrowLeft className="w-5 h-5 text-gray-300" />
+                                </button>
+                                <div className={`w-10 h-10 rounded-full bg-gradient-to-br ${getAvatarColor(selectedContact.contact?.username)} flex items-center justify-center text-white font-bold text-sm shadow-md flex-shrink-0`}>
                                     {getInitials(selectedContact.contact?.username)}
                                 </div>
                                 <div>
@@ -593,8 +600,8 @@ const Home = () => {
 
                         {/* Top banner if not in contacts */}
                         {selectedContact.contact?._id && !contacts.some(c => c.contact?._id === selectedContact.contact?._id) && (
-                            <div className="bg-indigo-500/10 border-b border-indigo-500/20 px-6 py-2 flex items-center justify-between">
-                                <p className="text-gray-300 text-xs">
+                            <div className="bg-indigo-500/10 border-b border-indigo-500/20 px-3 sm:px-6 py-2 flex items-center justify-between gap-2">
+                                <p className="text-gray-300 text-xs min-w-0">
                                     <span className="font-semibold text-white">{selectedContact.contact?.username}</span> is not in your contacts list.
                                 </p>
                                 <button
@@ -613,7 +620,7 @@ const Home = () => {
                             </div>
                         )}
 
-                        <div ref={chatContainerRef} onScroll={evaluateReadReceipts} className="flex-1 overflow-y-auto p-6 space-y-4 custom-scrollbar">
+                        <div ref={chatContainerRef} onScroll={evaluateReadReceipts} className="flex-1 overflow-y-auto p-3 sm:p-6 space-y-4 custom-scrollbar">
                             {hasMore && conversationId && (
                                 <button
                                     onClick={loadMoreMessages}
@@ -633,7 +640,7 @@ const Home = () => {
                                 const isMe = (msg.sender?._id || msg.sender) === user._id;
                                 return (
                                     <div key={msg._id || idx} className={`flex ${isMe ? 'justify-end' : 'justify-start'}`}>
-                                        <div className={`max-w-[70%] rounded-2xl px-4 py-2 shadow-lg ${isMe
+                                        <div className={`max-w-[85%] sm:max-w-[70%] rounded-2xl px-4 py-2 shadow-lg ${isMe
                                             ? 'bg-indigo-600 text-white rounded-tr-sm'
                                             : 'bg-white/10 text-gray-100 rounded-tl-none'
                                             }`}>
@@ -661,18 +668,18 @@ const Home = () => {
                             <div ref={messagesEndRef} />
                         </div>
 
-                        <form onSubmit={handleSendMessage} className="px-4 py-3 border-t border-white/10 bg-[#0f0f14]">
-                            <div className="flex items-center gap-3">
+                        <form onSubmit={handleSendMessage} className="px-3 sm:px-4 py-3 border-t border-white/10 bg-[#0f0f14]" style={{ paddingBottom: 'max(0.75rem, env(safe-area-inset-bottom))' }}>
+                            <div className="flex items-center gap-2 sm:gap-3">
                                 <input
                                     type="text"
                                     placeholder="Type a message..."
-                                    className="flex-1 bg-white/[0.04] border border-white/[0.08] rounded-xl py-2.5 px-4 text-white text-sm focus:outline-none focus:border-white/[0.16] transition-all font-light"
+                                    className="flex-1 min-w-0 bg-white/[0.04] border border-white/[0.08] rounded-xl py-2.5 px-4 text-white text-base sm:text-sm focus:outline-none focus:border-white/[0.16] transition-all font-light"
                                     value={newMessage}
                                     onChange={handleTyping}
                                 />
                                 <button
                                     type="submit"
-                                    className="w-10 h-10 rounded-xl bg-gradient-to-r from-indigo-600 to-violet-600 flex items-center justify-center shadow-lg hover:brightness-110 transition-all"
+                                    className="w-10 h-10 flex-shrink-0 rounded-xl bg-gradient-to-r from-indigo-600 to-violet-600 flex items-center justify-center shadow-lg hover:brightness-110 transition-all"
                                 >
                                     <Send className="w-4 h-4 text-white" />
                                 </button>

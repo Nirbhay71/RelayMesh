@@ -36,7 +36,7 @@ const AuthLayout = ({ children, title, subtitle, tagline }) => {
             </div>
 
             {/* ── RIGHT PANEL — Auth Form ───────────────────────── */}
-            <div className="flex-1 flex items-center justify-center px-8 py-12 relative overflow-hidden">
+            <div className="flex-1 flex items-center justify-center px-5 sm:px-8 py-8 sm:py-12 relative overflow-hidden overflow-y-auto">
 
                 {/* Subtle ambient glow */}
                 <div className="absolute top-[-15%] right-[-10%] w-[50%] h-[50%] bg-indigo-600/10 rounded-full blur-[140px] pointer-events-none" />
@@ -46,11 +46,11 @@ const AuthLayout = ({ children, title, subtitle, tagline }) => {
                     initial={{ opacity: 0, y: 24 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
-                    className="w-full max-w-[400px] relative z-10"
+                    className="w-full max-w-[400px] relative z-10 my-auto"
                 >
                     {/* Heading */}
                     <div className="mb-9">
-                        <h1 className="text-[2.15rem] font-bold text-white leading-tight tracking-tight">
+                        <h1 className="text-[1.7rem] sm:text-[2.15rem] font-bold text-white leading-tight tracking-tight">
                             {tagline || title}
                         </h1>
                         {subtitle && (
