@@ -6,3 +6,5 @@ add_test_users.js
 auto_signup.js
 open_website.js
 package-lock.json
+.agents
+graphify-out
