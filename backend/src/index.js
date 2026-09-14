@@ -6,7 +6,7 @@ import { initializeSocket } from "./socket.js";
 
 dotenv.config();
 
-const port = process.env.PORT || 7100;
+const port = process.env.PORT || 7000;
 
 // Initialize HTTP server and Socket.io
 const server = createServer(app);
@@ -35,14 +35,14 @@ connectDB(DB_URL)
 
 export { io };
 
-// Graceful shutdown — required for nodemon restarts
-// const shutdown = (signal) => {
-//     console.log(`\n${signal} received. Shutting down gracefully...`);
-//     server.close(() => {
-//         console.log("HTTP server closed.");
-//         process.exit(0);
-//     });
-// };
+// Graceful shutdown — required for clean restarts
+const shutdown = (signal) => {
+    console.log(`\n${signal} received. Shutting down gracefully...`);
+    server.close(() => {
+        console.log("HTTP server closed.");
+        process.exit(0);
+    });
+};
 
-// process.on("SIGTERM", () => shutdown("SIGTERM"));
-// process.on("SIGINT", () => shutdown("SIGINT"));
+process.on("SIGTERM", () => shutdown("SIGTERM"));
+process.on("SIGINT", () => shutdown("SIGINT"));

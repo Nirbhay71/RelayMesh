@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '../context/AuthContext';
 import AddContactModal from '../components/AddContactModal';
@@ -19,7 +19,7 @@ import {
     CheckCheck,
 } from 'lucide-react';
 
-const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:7100";
+const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:7000";
 
 const Home = () => {
     const { user, logout } = useAuth();
@@ -418,7 +418,12 @@ const Home = () => {
     };
 
     const handleContactAdded = (newContact) => {
-        setContacts((prev) => [newContact, ...prev]);
+        if (!newContact || !newContact.contact?._id) return;
+        setContacts((prev) => {
+            const newUserId = newContact.contact._id.toString();
+            const filtered = prev.filter((c) => c.contact?._id?.toString() !== newUserId && c._id?.toString() !== newContact._id?.toString());
+            return [newContact, ...filtered];
+        });
     };
 
     const handleDeleteClick = (e, contact) => {
@@ -517,12 +522,13 @@ const Home = () => {
                             <div className="w-8 h-8 border-2 border-indigo-500/20 border-t-indigo-500 rounded-full animate-spin"></div>
                         </div>
                     ) : (
-                        filteredContacts.map((contact) => {
+                        filteredContacts.map((contact, idx) => {
                             const contactUser = contact.contact;
-                            const isSelected = selectedContact?._id === contact._id;
+                            const isSelected = selectedContact?.contact?._id === contactUser?._id;
+                            const keyVal = contact._id ? `c-${contact._id}` : `u-${contactUser?._id || idx}`;
                             return (
                                 <div
-                                    key={contact._id}
+                                    key={keyVal}
                                     onClick={() => setSelectedContact(contact)}
                                     className={`flex items-center gap-3 px-4 py-3 cursor-pointer transition-all border-b border-white/5 group
                                         ${isSelected ? 'bg-indigo-500/[0.08] border-l-2 border-l-indigo-500/80' : 'hover:bg-white/5 border-l-2 border-l-transparent'}`}
@@ -571,9 +577,9 @@ const Home = () => {
                                             </motion.p>
                                         ) : (
                                             <>
-                                                <div className={`w-1.5 h-1.5 rounded-full ${contacts.find(c => c._id === selectedContact._id)?.contact?.isOnline ? 'bg-green-500 animate-pulse' : 'bg-gray-500'}`} />
+                                                <div className={`w-1.5 h-1.5 rounded-full ${contacts.find(c => c.contact?._id === selectedContact.contact?._id)?.contact?.isOnline ? 'bg-green-500 animate-pulse' : 'bg-gray-500'}`} />
                                                 <p className="text-gray-500 text-[10px] uppercase tracking-wider font-medium">
-                                                    {contacts.find(c => c._id === selectedContact._id)?.contact?.isOnline ? 'Online' : 'Offline'}
+                                                    {contacts.find(c => c.contact?._id === selectedContact.contact?._id)?.contact?.isOnline ? 'Online' : 'Offline'}
                                                 </p>
                                             </>
                                         )}
@@ -584,6 +590,28 @@ const Home = () => {
                                 <MoreVertical className="w-4.5 h-4.5 text-gray-400" />
                             </button>
                         </div>
+
+                        {/* Top banner if not in contacts */}
+                        {selectedContact.contact?._id && !contacts.some(c => c.contact?._id === selectedContact.contact?._id) && (
+                            <div className="bg-indigo-500/10 border-b border-indigo-500/20 px-6 py-2 flex items-center justify-between">
+                                <p className="text-gray-300 text-xs">
+                                    <span className="font-semibold text-white">{selectedContact.contact?.username}</span> is not in your contacts list.
+                                </p>
+                                <button
+                                    onClick={async () => {
+                                        try {
+                                            const res = await axios.post(`${API_BASE}/contacts/add`, { contactUserId: selectedContact.contact?._id }, { withCredentials: true });
+                                            handleContactAdded(res.data.data);
+                                        } catch (e) {
+                                            console.error("Add contact error:", e);
+                                        }
+                                    }}
+                                    className="text-xs bg-indigo-600 hover:bg-indigo-500 text-white px-3 py-1.5 rounded-lg transition-all flex items-center gap-1 font-medium shadow-sm"
+                                >
+                                    <UserPlus className="w-3.5 h-3.5" /> Add Contact
+                                </button>
+                            </div>
+                        )}
 
                         <div ref={chatContainerRef} onScroll={evaluateReadReceipts} className="flex-1 overflow-y-auto p-6 space-y-4 custom-scrollbar">
                             {hasMore && conversationId && (
@@ -664,7 +692,20 @@ const Home = () => {
                 )}
             </div>
 
-            <AddContactModal isOpen={showAddModal} onClose={() => setShowAddModal(false)} onContactAdded={handleContactAdded} />
+            <AddContactModal 
+                isOpen={showAddModal} 
+                onClose={() => setShowAddModal(false)} 
+                onContactAdded={handleContactAdded}
+                onSelectContact={(selected) => {
+                    if (selected) {
+                        if (selected._id && selected.contact?._id) {
+                            handleContactAdded(selected);
+                        }
+                        setSelectedContact(selected);
+                    }
+                    setShowAddModal(false);
+                }}
+            />
             <DeleteContactDialog isOpen={showDeleteDialog} onClose={() => setShowDeleteDialog(false)} onConfirm={handleDeleteConfirm} contactName={contactToDelete?.contact?.username || ''} />
         </div>
     );
