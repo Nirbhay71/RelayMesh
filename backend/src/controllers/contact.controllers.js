@@ -3,7 +3,10 @@ import { ApiResponce } from "../utils/ApiResponce.js"
 import { ApiError } from "../utils/ApiError.js"
 import { ContactModel } from "../models/contact.model.js"
 import { UserModel } from "../models/user.models.js"
-import { isUserOnline } from "../utils/redis.utils.js"
+import { isUserOnline, getOnlineStatusMap } from "../utils/redis.utils.js"
+
+// Escape regex metacharacters so user input can't build an unbounded/invalid pattern
+const escapeRegex = (str) => str.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 
 // ─────────────────────────────────────────────────
 // GET /contacts/search?q=...
@@ -19,26 +22,29 @@ const searchUsers = asyncHandler(async (req, res) => {
         );
     }
 
-    const regex = new RegExp(queryStr, "i");
+    // Anchored prefix match so Mongo can use the username/email indexes
+    // instead of a full collection scan (unanchored regex can't use an index).
+    const regex = new RegExp("^" + escapeRegex(queryStr), "i");
 
-    const matchingUsers = await UserModel.find({
-        _id: { $ne: req.user._id },
-        $or: [{ username: regex }, { email: regex }]
-    })
-    .select("username email avatar bio")
-    .limit(20);
-
-    const userContacts = await ContactModel.find({ owner: req.user._id }).select("contact");
-    const contactUserIds = new Set(userContacts.map(c => c.contact.toString()));
-
-    const results = await Promise.all(
-        matchingUsers.map(async (u) => {
-            const userObj = u.toObject();
-            userObj.isAlreadyContact = contactUserIds.has(userObj._id.toString());
-            userObj.isOnline = await isUserOnline(userObj._id.toString());
-            return userObj;
+    const [matchingUsers, userContacts] = await Promise.all([
+        UserModel.find({
+            _id: { $ne: req.user._id },
+            $or: [{ username: regex }, { email: regex }]
         })
-    );
+            .select("username email avatar bio")
+            .limit(20)
+            .lean(),
+        ContactModel.find({ owner: req.user._id }).select("contact").lean(),
+    ]);
+
+    const contactUserIds = new Set(userContacts.map(c => c.contact.toString()));
+    const onlineStatusMap = await getOnlineStatusMap(matchingUsers.map(u => u._id.toString()));
+
+    const results = matchingUsers.map((u) => ({
+        ...u,
+        isAlreadyContact: contactUserIds.has(u._id.toString()),
+        isOnline: onlineStatusMap.get(u._id.toString()) || false,
+    }));
 
     return res.status(200).json(
         new ApiResponce(200, results, "Users searched successfully")

@@ -82,6 +82,27 @@ const isUserOnline = async (userId) => {
 }
 
 /**
+ * Check online status for many users in a single round trip.
+ * Uses a pipeline so N lookups cost one network round trip instead of N.
+ * Returns a Map<userId, boolean>.
+ */
+const getOnlineStatusMap = async (userIds) => {
+    const statusMap = new Map();
+    if (!userIds.length) return statusMap;
+
+    const pipeline = redis.pipeline();
+    userIds.forEach((id) => pipeline.scard(`online:${id}`));
+    const results = await pipeline.exec();
+
+    userIds.forEach((id, i) => {
+        const count = results[i]?.[1] || 0;
+        statusMap.set(id, count > 0);
+    });
+
+    return statusMap;
+}
+
+/**
  * Get all active socket IDs for a user (useful for targeted emit).
  */
 const getUserSocketIds = async (userId) => {
@@ -151,6 +172,7 @@ export {
     setUserOnline,
     removeUserOnline,
     isUserOnline,
+    getOnlineStatusMap,
     getUserSocketIds,
     setTyping,
     clearTyping,
