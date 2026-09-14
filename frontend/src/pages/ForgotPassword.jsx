@@ -1,4 +1,4 @@
-﻿import React, { useState } from 'react';
+import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import AuthLayout from '../layouts/AuthLayout';
@@ -17,7 +17,7 @@ const ForgotPassword = () => {
         setError('');
         setMessage('');
         try {
-            await axios.post(`${import.meta.env.VITE_API_URL || 'http://localhost:7100'}/otp/send`, { email });
+            await axios.post(`${import.meta.env.VITE_API_URL || 'http://localhost:7000'}/otp/send`, { email });
             setMessage("OTP sent to your email!");
             setTimeout(() => navigate(`/reset-password?email=${email}`), 2000);
         } catch (err) {

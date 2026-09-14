@@ -6,6 +6,8 @@ import { AuthRouter } from "./routes/auth.routes.js";
 import { OTPRouter } from "./routes/OTP.routes.js";
 import { ContactRouter } from "./routes/contact.routes.js";
 import { MessageRouter } from "./routes/message.routes.js";
+import metricsMiddleware from './middlewares/metrics.middleware.js';
+import { metricsRouter } from './routes/metrics.routes.js';
 
 const app = express();
 
@@ -19,6 +21,7 @@ const devDefaults = [
     "http://192.168.1.7:5173",
     "http://192.168.1.7:5174",
 ];
+
 const allowedOrigins =
     !rawOrigins || rawOrigins === "*"
         ? devDefaults
@@ -35,6 +38,8 @@ app.use(cors({
     methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"]
 }));
+
+app.use(metricsMiddleware);
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
@@ -49,5 +54,16 @@ app.use("/auth", AuthRouter);
 app.use("/otp", OTPRouter);
 app.use("/contacts", ContactRouter);
 app.use("/messages", MessageRouter);
+app.use('/', metricsRouter);
+
+
+// Grefana
+// const client = require("./metrics");
+import {client} from "./metrics.js"
+
+app.get("/metrics", async (req, res) => {
+    res.set("Content-Type", client.register.contentType);
+    res.end(await client.register.metrics());
+});
 
 export { app }
