@@ -1,4 +1,4 @@
-﻿import React, { useState } from 'react';
+import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import AuthLayout from '../layouts/AuthLayout';
@@ -23,7 +23,7 @@ const Login = () => {
     };
 
     const handleGoogleLogin = () => {
-        window.location.href = `${import.meta.env.VITE_API_URL || 'http://localhost:7100'}/auth/google`;
+        window.location.href = `${import.meta.env.VITE_API_URL || 'http://localhost:7000'}/auth/google`;
     };
 
     return (

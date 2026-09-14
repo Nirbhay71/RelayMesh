@@ -6,25 +6,70 @@ import { UserModel } from "../models/user.models.js"
 import { isUserOnline } from "../utils/redis.utils.js"
 
 // ─────────────────────────────────────────────────
-// POST /contacts/add
-// Adds a contact — requires BOTH username AND email to match
-// the same User document in the database
+// GET /contacts/search?q=...
+// Search users by username or email (excluding logged-in user)
 // ─────────────────────────────────────────────────
-const addContact = asyncHandler(async (req, res) => {
-    const { username, email } = req.body;
+const searchUsers = asyncHandler(async (req, res) => {
+    const { q = "" } = req.query;
+    const queryStr = q.trim();
 
-    if (!username || !email) {
-        throw new ApiError(400, "Both username and email are required");
+    if (!queryStr) {
+        return res.status(200).json(
+            new ApiResponce(200, [], "Empty search query")
+        );
     }
 
-    // Find a user where BOTH username and email match
-    const targetUser = await UserModel.findOne({
-        username: username.toLowerCase().trim(),
-        email: email.toLowerCase().trim(),
-    });
+    const regex = new RegExp(queryStr, "i");
+
+    const matchingUsers = await UserModel.find({
+        _id: { $ne: req.user._id },
+        $or: [{ username: regex }, { email: regex }]
+    })
+    .select("username email avatar bio")
+    .limit(20);
+
+    const userContacts = await ContactModel.find({ owner: req.user._id }).select("contact");
+    const contactUserIds = new Set(userContacts.map(c => c.contact.toString()));
+
+    const results = await Promise.all(
+        matchingUsers.map(async (u) => {
+            const userObj = u.toObject();
+            userObj.isAlreadyContact = contactUserIds.has(userObj._id.toString());
+            userObj.isOnline = await isUserOnline(userObj._id.toString());
+            return userObj;
+        })
+    );
+
+    return res.status(200).json(
+        new ApiResponce(200, results, "Users searched successfully")
+    );
+})
+
+// ─────────────────────────────────────────────────
+// POST /contacts/add
+// Adds a contact by contactUserId, username, or email
+// ─────────────────────────────────────────────────
+const addContact = asyncHandler(async (req, res) => {
+    const { username, email, contactUserId } = req.body;
+
+    let targetUser = null;
+
+    if (contactUserId) {
+        targetUser = await UserModel.findById(contactUserId);
+    } else if (username && email) {
+        targetUser = await UserModel.findOne({
+            username: username.toLowerCase().trim(),
+            email: email.toLowerCase().trim(),
+        });
+    } else if (username || email) {
+        const queryVal = (username || email).toLowerCase().trim();
+        targetUser = await UserModel.findOne({
+            $or: [{ username: queryVal }, { email: queryVal }]
+        });
+    }
 
     if (!targetUser) {
-        throw new ApiError(404, "No user found with this username and email combination");
+        throw new ApiError(404, "User not found");
     }
 
     // Prevent adding yourself as a contact
@@ -39,7 +84,15 @@ const addContact = asyncHandler(async (req, res) => {
     });
 
     if (existingContact) {
-        throw new ApiError(409, "This user is already in your contacts");
+        const populatedContact = await ContactModel.findById(existingContact._id)
+            .populate("contact", "username email avatar bio");
+
+        const contactObj = populatedContact.toObject();
+        contactObj.contact.isOnline = await isUserOnline(targetUser._id.toString());
+
+        return res.status(200).json(
+            new ApiResponce(200, contactObj, "User is already in your contacts")
+        );
     }
 
     const newContact = await ContactModel.create({
@@ -108,4 +161,4 @@ const deleteContact = asyncHandler(async (req, res) => {
     );
 })
 
-export { addContact, getContacts, deleteContact }
+export { searchUsers, addContact, getContacts, deleteContact }

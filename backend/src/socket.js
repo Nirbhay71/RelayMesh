@@ -4,6 +4,15 @@ import { redis, setUserOnline, removeUserOnline, isUserOnline } from "./utils/re
 import { socketAuth } from "./middlewares/socket.auth.middleware.js";
 import { ConversationModel } from "./models/conversation.model.js";
 import { MessageModel } from "./models/message.model.js";
+import {
+    trackSocketConnection,
+    trackSocketDisconnection,
+    trackSocketEvent,
+    trackMessageSent,
+    trackMessageDelivery,
+    trackMessageSeen,
+    updateOnlineUsers
+} from './utils/socket-metrics.js';
 
 /**
  * Initializes Socket.io and attaches it to the HTTP server
@@ -18,9 +27,20 @@ export const initializeSocket = (server) => {
         console.error("Redis subClient error:", err.message);
     });
 
+    const rawOrigins = process.env.CORS_ORIGIN || "";
+    const devDefaults = [
+        "http://localhost:5173",
+        "http://localhost:5174",
+        "http://192.168.1.7:5173",
+        "http://192.168.1.7:5174",
+    ];
+    const allowedOrigins = !rawOrigins || rawOrigins === "*"
+        ? devDefaults
+        : rawOrigins.split(",").map((o) => o.trim()).filter(Boolean);
+
     const io = new Server(server, {
         cors: {
-            origin: process.env.CORS_ORIGIN || ["http://localhost:5173", "http://localhost:5174", "http://192.168.1.7:5173", "http://192.168.1.7:5174"],
+            origin: allowedOrigins,
             methods: ["GET", "POST"],
             credentials: true
         },
@@ -31,6 +51,9 @@ export const initializeSocket = (server) => {
     io.use(socketAuth);
 
     io.on("connection", async (socket) => {
+
+        trackSocketConnection();
+
         const userId = socket.user._id.toString();
         console.log(`User connected: ${socket.user.username} (${userId})`);
 
@@ -50,13 +73,13 @@ export const initializeSocket = (server) => {
         try {
             const userConversations = await ConversationModel.find({ participants: userId }).select('_id');
             const conversationIds = userConversations.map(c => c._id);
-            
+
             const missedMessages = await MessageModel.find({
                 conversationId: { $in: conversationIds },
                 sender: { $ne: userId },
                 deliveredTo: { $ne: userId }
             }).sort({ createdAt: 1 }).limit(50).populate('sender', 'username avatar');
-            
+
             if (missedMessages.length > 0) {
                 console.log(`[Sync] Pushing ${missedMessages.length} missed messages to ${socket.user.username}`);
                 socket.emit("missedMessages", missedMessages);
@@ -68,7 +91,7 @@ export const initializeSocket = (server) => {
         // ─────────────────────────────────────────────────
         // [2] [Server] Received sendMessage
         // ─────────────────────────────────────────────────
-        socket.on("sendMessage", async (data) => {
+        socket.on("sendMessage",  trackSocketEvent('sendMessage', async (data) => {
             const { recipientId, content, messageType = "text" } = data;
 
             console.log(`[2] [Server] Received sendMessage from ${socket.user.username} to ${recipientId}`);
@@ -128,7 +151,7 @@ export const initializeSocket = (server) => {
                 console.error("Socket error (sendMessage):", error.message);
                 socket.emit("error", { message: "Failed to send message" });
             }
-        });
+        }));
 
         // ─────────────────────────────────────────────────
         // Typing Indicators
@@ -138,9 +161,9 @@ export const initializeSocket = (server) => {
             if (conversationId && Array.isArray(participantIds)) {
                 participantIds.forEach(pId => {
                     if (pId !== userId) {
-                        io.to(pId).emit("userTyping", { 
-                            conversationId, 
-                            username: socket.user.username 
+                        io.to(pId).emit("userTyping", {
+                            conversationId,
+                            username: socket.user.username
                         });
                     }
                 });
@@ -152,9 +175,9 @@ export const initializeSocket = (server) => {
             if (conversationId && Array.isArray(participantIds)) {
                 participantIds.forEach(pId => {
                     if (pId !== userId) {
-                        io.to(pId).emit("userStoppedTyping", { 
-                            conversationId, 
-                            username: socket.user.username 
+                        io.to(pId).emit("userStoppedTyping", {
+                            conversationId,
+                            username: socket.user.username
                         });
                     }
                 });
@@ -221,8 +244,8 @@ export const initializeSocket = (server) => {
 
                 const result = await MessageModel.updateMany(
                     filter,
-                    { 
-                        $addToSet: { readBy: userId, deliveredTo: userId } 
+                    {
+                        $addToSet: { readBy: userId, deliveredTo: userId }
                     }
                 );
 
@@ -250,6 +273,7 @@ export const initializeSocket = (server) => {
 
         socket.on("disconnect", async () => {
             console.log(`User disconnected: ${socket.user.username} (${socket.id})`);
+            trackSocketDisconnection();
             await removeUserOnline(userId, socket.id);
 
             // Re-check if user is truly offline (no more active sockets)

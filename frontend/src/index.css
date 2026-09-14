@@ -94,6 +94,13 @@ body {
   color: rgba(156, 163, 175, 0.5);
 }
 
+/* Prevent iOS Safari auto-zoom on focus (needs >=16px font) */
+@media (max-width: 640px) {
+  .auth-input {
+    font-size: 16px;
+  }
+}
+
 .auth-input:focus {
   border-color: rgba(255, 255, 255, 0.18);
   box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.08);
