@@ -31,10 +31,10 @@ const getInitials = (name) => {
 
 const getAvatarColor = (name) => {
     const colors = [
-        'from-blue-500 to-cyan-500', 'from-purple-500 to-pink-500',
-        'from-green-500 to-emerald-500', 'from-orange-500 to-amber-500',
-        'from-red-500 to-rose-500', 'from-indigo-500 to-violet-500',
-        'from-teal-500 to-green-500', 'from-fuchsia-500 to-purple-500',
+        'from-zinc-700 to-zinc-900', 'from-neutral-600 to-neutral-800',
+        'from-gray-700 to-black', 'from-stone-600 to-stone-900',
+        'from-neutral-700 to-black', 'from-zinc-800 to-black',
+        'from-gray-600 to-gray-900', 'from-stone-700 to-black',
     ];
     let hash = 0;
     for (let i = 0; i < (name?.length || 0); i++) {
@@ -603,14 +603,14 @@ const Home = () => {
                 key={keyVal}
                 onClick={() => handleSelectContact(item)}
                 className={`flex items-center gap-3 px-4 py-3 cursor-pointer transition-all border-b border-white/5 group
-                    ${isSelected ? 'bg-[#3B82F6]/[0.12] border-l-2 border-l-[#3B82F6]' : 'hover:bg-white/[0.04] border-l-2 border-l-transparent'}`}
+                    ${isSelected ? 'bg-white/[0.12] border-l-2 border-l-white' : 'hover:bg-white/[0.04] border-l-2 border-l-transparent'}`}
             >
                 <div className="relative flex-shrink-0">
                     <div className={`w-11 h-11 rounded-full bg-gradient-to-br ${getAvatarColor(contactUser?.username)} flex items-center justify-center text-white font-bold text-sm shadow-md`}>
                         {getInitials(contactUser?.username)}
                     </div>
                     {contactUser?.isOnline && (
-                        <div className="absolute bottom-0 right-0 w-3 h-3 bg-[#3B82F6] border-2 border-[#111114] rounded-full shadow-lg" />
+                        <div className="absolute bottom-0 right-0 w-3 h-3 bg-white border-2 border-[#111114] rounded-full shadow-lg" />
                     )}
                 </div>
                 <div className="flex-1 min-w-0">
@@ -623,7 +623,7 @@ const Home = () => {
                     <div className="flex items-center justify-between gap-2">
                         <p className="text-gray-500 text-xs truncate">{showMeta ? getLastMessagePreview(item) : contactUser?.email}</p>
                         {showMeta && item.unreadCount > 0 && (
-                            <span className="flex-shrink-0 min-w-[18px] h-[18px] px-1 rounded-full bg-[#3B82F6] text-white text-[10px] font-semibold flex items-center justify-center">
+                            <span className="flex-shrink-0 min-w-[18px] h-[18px] px-1 rounded-full bg-white text-black text-[10px] font-semibold flex items-center justify-center">
                                 {item.unreadCount > 99 ? '99+' : item.unreadCount}
                             </span>
                         )}
@@ -648,7 +648,7 @@ const Home = () => {
             key={label}
             onClick={onClick}
             title={label}
-            className={`relative w-11 h-11 rounded-xl flex items-center justify-center transition-colors ${isActive ? 'bg-[#3B82F6] text-white' : 'text-gray-500 hover:bg-white/10 hover:text-gray-300'}`}
+            className={`relative w-11 h-11 rounded-xl flex items-center justify-center transition-colors ${isActive ? 'bg-white text-black' : 'text-gray-500 hover:bg-white/10 hover:text-gray-300'}`}
         >
             <Icon className="w-5 h-5" />
             {badgeCount > 0 && (
@@ -660,11 +660,19 @@ const Home = () => {
     );
 
     return (
-        <div className="h-[100dvh] w-full flex bg-[#0a0a0c] overflow-hidden">
+        <div className="h-[100dvh] w-full flex overflow-hidden relative" style={{ background: '#070b14' }}>
+            {/* ── Aurora ambient background — shared across all three panels ── */}
+            <div className="aurora-bg" aria-hidden="true">
+                <div className="aurora-blob aurora-blob-1" />
+                <div className="aurora-blob aurora-blob-2" />
+                <div className="aurora-blob aurora-blob-3" />
+                <div className="aurora-blob aurora-blob-4" />
+                <div className="aurora-blob aurora-blob-5" />
+            </div>
             {/* ── LEFT: icon rail + list panel, hidden together on mobile when a chat is open ── */}
             <div className={`${selectedContact ? 'hidden md:flex' : 'flex'} h-full`}>
                 {/* Icon rail */}
-                <div className="w-16 flex-shrink-0 flex flex-col items-center py-5 gap-2 bg-[#0a0a0c] border-r border-white/[0.06]">
+                <div className="panel-rail relative z-10 w-16 flex-shrink-0 flex flex-col items-center py-5 gap-2">
                     {renderRailButton(MessageSquare, 'Chats', activeTab === 'chats', () => setActiveTab('chats'), totalUnread)}
                     {renderRailButton(Users, 'Contacts', activeTab === 'contacts', () => setActiveTab('contacts'))}
                     {renderRailButton(Settings, 'Settings', activeTab === 'settings', () => setActiveTab('settings'))}
@@ -675,7 +683,7 @@ const Home = () => {
                 </div>
 
                 {/* List panel */}
-                <div className="w-[calc(100vw-4rem)] sm:w-[320px] md:w-[340px] border-r border-white/10 flex flex-col bg-[#111114]">
+                <div className="panel-sidebar relative z-10 w-[calc(100vw-4rem)] sm:w-[320px] md:w-[340px] flex flex-col">
                     {activeTab === 'chats' && (
                         <>
                             <div className="px-4 py-3 border-b border-white/10 flex items-center justify-between">
@@ -688,9 +696,6 @@ const Home = () => {
                                         <p className="text-gray-500 text-xs truncate">{user?.email}</p>
                                     </div>
                                 </div>
-                                <button onClick={() => setShowAddModal(true)} className="w-9 h-9 rounded-lg hover:bg-white/10 flex items-center justify-center transition-colors group flex-shrink-0">
-                                    <UserPlus className="w-4.5 h-4.5 text-gray-400 group-hover:text-[#60A5FA] transition-colors" />
-                                </button>
                             </div>
 
                             <div className="px-3 py-2">
@@ -709,7 +714,7 @@ const Home = () => {
                             {/* Quick-access avatar row */}
                             <div className="px-3 py-1 flex items-center gap-3 overflow-x-auto no-scrollbar">
                                 <button onClick={() => setShowAddModal(true)} className="flex flex-col items-center gap-1 flex-shrink-0 w-14">
-                                    <div className="w-12 h-12 rounded-full border-2 border-dashed border-white/20 flex items-center justify-center text-gray-400 hover:border-[#3B82F6] hover:text-[#60A5FA] transition-colors">
+                                    <div className="w-12 h-12 rounded-full border-2 border-dashed border-white/20 flex items-center justify-center text-gray-400 hover:border-white hover:text-white transition-colors">
                                         <UserPlus className="w-5 h-5" />
                                     </div>
                                     <span className="text-[10px] text-gray-500">Add</span>
@@ -717,11 +722,11 @@ const Home = () => {
                                 {starredContacts.map((item) => (
                                     <button key={`quick-${item._id}`} onClick={() => handleSelectContact(item)} className="flex flex-col items-center gap-1 flex-shrink-0 w-14">
                                         <div className="relative">
-                                            <div className={`w-12 h-12 rounded-full bg-gradient-to-br ${getAvatarColor(item.contact?.username)} flex items-center justify-center text-white font-bold text-sm ring-2 ring-[#3B82F6]/60`}>
+                                            <div className={`w-12 h-12 rounded-full bg-gradient-to-br ${getAvatarColor(item.contact?.username)} flex items-center justify-center text-white font-bold text-sm ring-2 ring-white/30`}>
                                                 {getInitials(item.contact?.username)}
                                             </div>
                                             {item.contact?.isOnline && (
-                                                <div className="absolute bottom-0 right-0 w-3 h-3 bg-[#3B82F6] border-2 border-[#111114] rounded-full" />
+                                                <div className="absolute bottom-0 right-0 w-3 h-3 bg-white border-2 border-[#111114] rounded-full" />
                                             )}
                                         </div>
                                         <span className="text-[10px] text-gray-400 truncate w-full text-center">{item.contact?.username}</span>
@@ -732,7 +737,7 @@ const Home = () => {
                             <div className="flex-1 overflow-y-auto custom-scrollbar mt-1">
                                 {loadingContacts ? (
                                     <div className="flex items-center justify-center py-20">
-                                        <div className="w-8 h-8 border-2 border-[#3B82F6]/20 border-t-[#3B82F6] rounded-full animate-spin"></div>
+                                        <div className="w-8 h-8 border-2 border-white/20 border-t-white rounded-full animate-spin"></div>
                                     </div>
                                 ) : (
                                     <>
@@ -826,10 +831,10 @@ const Home = () => {
             </div>
 
             {/* ── RIGHT PANEL (Chat Area) ──────────────────────── */}
-            <div className={`flex-1 flex-col bg-[#0a0a0c] min-w-0 ${selectedContact ? 'flex' : 'hidden md:flex'}`}>
+            <div className={`panel-chat relative z-10 flex-1 flex-col min-w-0 ${selectedContact ? 'flex' : 'hidden md:flex'}`}>
                 {selectedContact ? (
                     <>
-                        <div className="px-3 sm:px-6 py-3 border-b border-white/10 flex items-center justify-between bg-[#111114]">
+                        <div className="panel-chat-bar px-3 sm:px-6 py-3 border-b flex items-center justify-between">
                             <div className="flex items-center gap-2 sm:gap-3 min-w-0">
                                 <button
                                     onClick={() => setSelectedContact(null)}
@@ -937,7 +942,7 @@ const Home = () => {
                             <div ref={messagesEndRef} />
                         </div>
 
-                        <form onSubmit={handleSendMessage} className="px-3 sm:px-4 py-3 border-t border-white/10 bg-[#111114]" style={{ paddingBottom: 'max(0.75rem, env(safe-area-inset-bottom))' }}>
+                        <form onSubmit={handleSendMessage} className="panel-chat-bar px-3 sm:px-4 py-3 border-t" style={{ paddingBottom: 'max(0.75rem, env(safe-area-inset-bottom))' }}>
                             <div className="flex items-center gap-2 sm:gap-3">
                                 <input
                                     type="text"
@@ -957,12 +962,92 @@ const Home = () => {
                     </>
                 ) : (
                     <div className="flex-1 flex items-center justify-center">
-                        <div className="text-center">
-                            <div className="w-24 h-24 rounded-3xl bg-gradient-to-br from-[#3B82F6]/10 to-[#3B82F6]/5 border border-white/10 flex items-center justify-center mx-auto mb-6">
-                                <MessageSquare className="w-12 h-12 text-[#60A5FA]/30" />
+                        <div className="text-center select-none">
+                            {/* ── RelayMesh bespoke SVG logo ── */}
+                            <div className="mx-auto mb-7 flex items-center justify-center" style={{ width: 120, height: 120 }}>
+                                <svg viewBox="0 0 120 120" width="120" height="120" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <defs>
+                                        <radialGradient id="hub-glow" cx="50%" cy="50%" r="50%">
+                                            <stop offset="0%"   stopColor="#ffffff" stopOpacity="0.95" />
+                                            <stop offset="60%"  stopColor="#cccccc" stopOpacity="0.55" />
+                                            <stop offset="100%" stopColor="#888888" stopOpacity="0"    />
+                                        </radialGradient>
+                                        <radialGradient id="bg-glow" cx="50%" cy="50%" r="50%">
+                                            <stop offset="0%"   stopColor="#ffffff" stopOpacity="0.06" />
+                                            <stop offset="100%" stopColor="#ffffff" stopOpacity="0"    />
+                                        </radialGradient>
+                                        <filter id="node-blur">
+                                            <feGaussianBlur stdDeviation="1.2" />
+                                        </filter>
+                                        <filter id="hub-blur">
+                                            <feGaussianBlur stdDeviation="3" />
+                                        </filter>
+                                    </defs>
+
+                                    {/* Ambient background glow */}
+                                    <circle cx="60" cy="60" r="52" fill="url(#bg-glow)" className="rm-logo-pulse" />
+
+                                    {/* Outer rotating ring — solid thin circle with tick marks */}
+                                    <g className="rm-logo-ring-out" style={{ transformOrigin: '60px 60px' }}>
+                                        <circle cx="60" cy="60" r="50" stroke="rgba(255,255,255,0.12)" strokeWidth="0.8" />
+                                        {[0,60,120,180,240,300].map(a => {
+                                            const rad = (a * Math.PI) / 180;
+                                            const x1 = 60 + 47 * Math.cos(rad), y1 = 60 + 47 * Math.sin(rad);
+                                            const x2 = 60 + 50 * Math.cos(rad), y2 = 60 + 50 * Math.sin(rad);
+                                            return <line key={a} x1={x1} y1={y1} x2={x2} y2={y2} stroke="rgba(255,255,255,0.30)" strokeWidth="1.2" strokeLinecap="round" />;
+                                        })}
+                                    </g>
+
+                                    {/* Inner counter-rotating dashed ring */}
+                                    <g className="rm-logo-ring-in" style={{ transformOrigin: '60px 60px' }}>
+                                        <circle cx="60" cy="60" r="38" stroke="rgba(255,255,255,0.10)" strokeWidth="0.7" strokeDasharray="4 6" />
+                                    </g>
+
+                                    {/* Six hex-orbit nodes + mesh connection lines */}
+                                    {[0,60,120,180,240,300].map((angle, i) => {
+                                        const rad      = ((angle - 90) * Math.PI) / 180;
+                                        const nx = 60 + 38 * Math.cos(rad);
+                                        const ny = 60 + 38 * Math.sin(rad);
+                                        // next node for ring-edge
+                                        const radN     = (((angle + 60) - 90) * Math.PI) / 180;
+                                        const nxN = 60 + 38 * Math.cos(radN);
+                                        const nyN = 60 + 38 * Math.sin(radN);
+                                        const blinkClass = ['rm-node-a','rm-node-b','rm-node-c','rm-node-a','rm-node-b','rm-node-c'][i];
+                                        return (
+                                            <g key={angle}>
+                                                {/* spoke from hub to node */}
+                                                <line x1="60" y1="60" x2={nx} y2={ny}
+                                                      stroke="rgba(255,255,255,0.14)" strokeWidth="0.8" />
+                                                {/* ring edge to next node */}
+                                                <line x1={nx} y1={ny} x2={nxN} y2={nyN}
+                                                      stroke="rgba(255,255,255,0.10)" strokeWidth="0.7" />
+                                                {/* node glow halo */}
+                                                <circle cx={nx} cy={ny} r="5.5" fill="rgba(255,255,255,0.04)" filter="url(#node-blur)" />
+                                                {/* node dot */}
+                                                <circle cx={nx} cy={ny} r="2.8"
+                                                        fill="rgba(255,255,255,0.90)"
+                                                        className={blinkClass} />
+                                            </g>
+                                        );
+                                    })}
+
+                                    {/* Central hub glow layer */}
+                                    <circle cx="60" cy="60" r="10" fill="rgba(255,255,255,0.08)" filter="url(#hub-blur)" className="rm-logo-pulse" />
+
+                                    {/* Central hub — layered rings */}
+                                    <circle cx="60" cy="60" r="7.5" stroke="rgba(255,255,255,0.22)" strokeWidth="0.8" fill="rgba(255,255,255,0.06)" />
+                                    <circle cx="60" cy="60" r="4.5" fill="rgba(255,255,255,0.60)" />
+                                    {/* Hub core bright dot */}
+                                    <circle cx="60" cy="60" r="2"   fill="rgba(255,255,255,1)" />
+                                </svg>
                             </div>
-                            <h2 className="text-2xl font-bold bg-gradient-to-r from-[#3B82F6] to-[#2563EB] bg-clip-text text-transparent mb-2">RelayMesh</h2>
-                            <p className="text-gray-500 text-sm">Select a contact to start chatting</p>
+
+                            <h2 className="text-2xl font-bold tracking-tight mb-2"
+                                style={{ background: 'linear-gradient(135deg,#fff 30%,rgba(255,255,255,0.55) 100%)',
+                                         WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
+                                RelayMesh
+                            </h2>
+                            <p className="text-gray-600 text-sm tracking-wide">Select a contact to start chatting</p>
                         </div>
                     </div>
                 )}

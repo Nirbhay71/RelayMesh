@@ -1,0 +1,144 @@
+﻿.splash-container {
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    background-color: #010204; /* extremely dark black/navy */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: opacity 1.2s cubic-bezier(0.4, 0, 0.2, 1);
+    pointer-events: auto;
+}
+
+.splash-container.fade-out {
+    opacity: 0;
+    pointer-events: none;
+}
+
+/* The Aurora Layer that gets masked into dots */
+.splash-aurora-layer {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    /* CSS Mask creates the dot grid */
+    -webkit-mask-image: radial-gradient(circle, black 35%, transparent 40%);
+    mask-image: radial-gradient(circle, black 35%, transparent 40%);
+    -webkit-mask-size: 7px 7px;
+    mask-size: 7px 7px;
+    -webkit-mask-repeat: repeat;
+    mask-repeat: repeat;
+    
+    opacity: 0; /* Phase 0: Start practically invisible */
+    transition: opacity 2.5s ease-in-out;
+}
+
+/* Phase 1: Aurora Awakens */
+.splash-aurora-layer.phase-1 { opacity: 0.35; }
+/* Phase 2: Brand Emerges */
+.splash-aurora-layer.phase-2 { opacity: 0.6; }
+/* Phase 3: Peak */
+.splash-aurora-layer.phase-3 { opacity: 0.9; }
+
+.splash-blob {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(70px);
+    will-change: transform, opacity;
+}
+
+/* Bright warm/white glow (like bottom left / top right of ref) */
+.splash-blob-1 {
+    width: 60vw;
+    height: 60vw;
+    top: -20%;
+    right: -10%;
+    background: radial-gradient(circle, rgba(255, 245, 230, 0.6) 0%, rgba(200, 180, 150, 0.2) 40%, transparent 70%);
+    animation: splash-drift-1 18s ease-in-out infinite alternate;
+}
+
+/* Deep blue/cyan (like bottom right of ref) */
+.splash-blob-2 {
+    width: 70vw;
+    height: 70vw;
+    bottom: -30%;
+    right: -10%;
+    background: radial-gradient(circle, rgba(50, 140, 255, 0.45) 0%, rgba(20, 80, 200, 0.15) 50%, transparent 70%);
+    animation: splash-drift-2 22s ease-in-out infinite alternate-reverse;
+}
+
+/* Another warm white glow (bottom left of ref) */
+.splash-blob-3 {
+    width: 65vw;
+    height: 65vw;
+    bottom: -10%;
+    left: -20%;
+    background: radial-gradient(circle, rgba(255, 250, 245, 0.55) 0%, rgba(180, 180, 190, 0.15) 45%, transparent 70%);
+    animation: splash-drift-3 20s ease-in-out infinite alternate;
+}
+
+/* Soft cyan upper left */
+.splash-blob-4 {
+    width: 50vw;
+    height: 50vw;
+    top: -10%;
+    left: -10%;
+    background: radial-gradient(circle, rgba(140, 220, 255, 0.35) 0%, rgba(60, 120, 200, 0.1) 50%, transparent 70%);
+    animation: splash-drift-4 15s ease-in-out infinite alternate-reverse;
+}
+
+@keyframes splash-drift-1 {
+    0%   { transform: translate(0, 0) scale(0.9); }
+    100% { transform: translate(-10vw, 15vh) scale(1.15); }
+}
+
+@keyframes splash-drift-2 {
+    0%   { transform: translate(0, 0) scale(1); }
+    100% { transform: translate(-15vw, -15vh) scale(1.2); }
+}
+
+@keyframes splash-drift-3 {
+    0%   { transform: translate(0, 0) scale(0.85); }
+    100% { transform: translate(15vw, -5vh) scale(1.1); }
+}
+
+@keyframes splash-drift-4 {
+    0%   { transform: translate(0, 0) scale(1); }
+    100% { transform: translate(10vw, 10vh) scale(1.2); }
+}
+
+/* Brand Text Container */
+.splash-brand-container {
+    position: relative;
+    z-index: 10;
+}
+
+.splash-brand-text {
+    font-family: 'Inter', system-ui, sans-serif;
+    font-weight: 600;
+    font-size: 4.5rem;
+    letter-spacing: -0.05em;
+    color: transparent;
+    background: linear-gradient(135deg, #ffffff 30%, rgba(255, 255, 255, 0.5) 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    
+    opacity: 0;
+    filter: blur(12px);
+    transform: scale(0.92);
+    transition: all 1.8s cubic-bezier(0.2, 0.0, 0.2, 1);
+}
+
+.splash-brand-container.phase-2 .splash-brand-text,
+.splash-brand-container.phase-3 .splash-brand-text {
+    opacity: 1;
+    filter: blur(0px);
+    transform: scale(1);
+    /* Subtle glow behind the text to separate from background */
+    text-shadow: 0 0 50px rgba(255, 255, 255, 0.2);
+}
+
+/* Reduced Motion */
+@media (prefers-reduced-motion: reduce) {
+    .splash-blob { animation: none !important; }
+    .splash-brand-text { transition: opacity 1s ease-in-out; filter: none !important; transform: none !important; }
+}

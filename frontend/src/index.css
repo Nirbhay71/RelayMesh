@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+﻿@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -10,7 +10,7 @@
   line-height: 1.5;
   font-weight: 400;
   color: #ffffff;
-  background-color: #0c0c0c;
+  background-color: #050505;
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
@@ -20,16 +20,229 @@
 body {
   margin: 0;
   overflow-x: hidden;
-  background: #0c0c0c;
+  background: #050505;
 }
 
 #root {
   width: 100%;
+  position: relative;
 }
 
-/* ─── Auth Component System ──────────────────────────── */
+/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+   BLACK & WHITE AURORA â€” pure monochrome shimmer
+   Soft white/silver blobs breathe over pure black.
+   No colour â€” only light and darkness.
+   â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 
-/* Pill button — default (dark matte) */
+.aurora-bg {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  overflow: hidden;
+  background: #050505;
+  will-change: transform;
+  transform: translateZ(0);
+}
+
+.aurora-blob {
+  position: absolute;
+  border-radius: 50%;
+  pointer-events: none;
+  will-change: transform, opacity;
+}
+
+/* Blob 1 â€” upper-left, soft silver shimmer */
+.aurora-blob-1 {
+  width: 70vw;
+  height: 70vw;
+  top: -22%;
+  left: -12%;
+  background: radial-gradient(
+    circle,
+    rgba(255, 255, 255, 0.055) 0%,
+    rgba(220, 220, 220, 0.022) 42%,
+    transparent 68%
+  );
+  filter: blur(80px);
+  animation: aurora-drift-1 28s ease-in-out infinite;
+}
+
+/* Blob 2 â€” upper-right, cool white */
+.aurora-blob-2 {
+  width: 58vw;
+  height: 58vw;
+  top: -12%;
+  right: -8%;
+  background: radial-gradient(
+    circle,
+    rgba(255, 255, 255, 0.045) 0%,
+    rgba(200, 200, 200, 0.018) 44%,
+    transparent 68%
+  );
+  filter: blur(96px);
+  animation: aurora-drift-2 35s ease-in-out infinite;
+}
+
+/* Blob 3 â€” centre, pure white glow */
+.aurora-blob-3 {
+  width: 75vw;
+  height: 75vw;
+  top: 18%;
+  left: 10%;
+  background: radial-gradient(
+    circle,
+    rgba(255, 255, 255, 0.032) 0%,
+    rgba(180, 180, 180, 0.012) 50%,
+    transparent 72%
+  );
+  filter: blur(110px);
+  animation: aurora-drift-3 40s ease-in-out infinite;
+}
+
+/* Blob 4 â€” bottom-left, silver mist */
+.aurora-blob-4 {
+  width: 52vw;
+  height: 52vw;
+  bottom: -18%;
+  left: 8%;
+  background: radial-gradient(
+    circle,
+    rgba(255, 255, 255, 0.048) 0%,
+    rgba(210, 210, 210, 0.018) 44%,
+    transparent 70%
+  );
+  filter: blur(88px);
+  animation: aurora-drift-4 32s ease-in-out infinite;
+}
+
+/* Blob 5 â€” bottom-right, faint white breath */
+.aurora-blob-5 {
+  width: 58vw;
+  height: 58vw;
+  bottom: -12%;
+  right: -5%;
+  background: radial-gradient(
+    circle,
+    rgba(255, 255, 255, 0.038) 0%,
+    rgba(190, 190, 190, 0.014) 46%,
+    transparent 70%
+  );
+  filter: blur(92px);
+  animation: aurora-drift-5 38s ease-in-out infinite;
+}
+
+/* â”€â”€â”€ Keyframe animations â€” very slow, organic drift â”€â”€â”€ */
+
+@keyframes aurora-drift-1 {
+  0%   { transform: translate(0,    0)    scale(1.00); opacity: 0.80; }
+  25%  { transform: translate(5vw,  3vh)  scale(1.07); opacity: 1.00; }
+  55%  { transform: translate(3vw,  8vh)  scale(0.95); opacity: 0.72; }
+  80%  { transform: translate(1vw,  5vh)  scale(1.03); opacity: 0.90; }
+  100% { transform: translate(0,    0)    scale(1.00); opacity: 0.80; }
+}
+
+@keyframes aurora-drift-2 {
+  0%   { transform: translate(0,    0)    scale(1.00); opacity: 0.70; }
+  30%  { transform: translate(-5vw, 5vh)  scale(1.09); opacity: 0.90; }
+  60%  { transform: translate(-2vw, 2vh)  scale(0.93); opacity: 0.65; }
+  85%  { transform: translate(-4vw, 4vh)  scale(1.05); opacity: 0.80; }
+  100% { transform: translate(0,    0)    scale(1.00); opacity: 0.70; }
+}
+
+@keyframes aurora-drift-3 {
+  0%   { transform: translate(0,    0)    scale(1.00); opacity: 0.65; }
+  35%  { transform: translate(4vw, -4vh)  scale(1.06); opacity: 0.85; }
+  65%  { transform: translate(-3vw, 4vh)  scale(0.96); opacity: 0.58; }
+  90%  { transform: translate(2vw, -2vh)  scale(1.02); opacity: 0.75; }
+  100% { transform: translate(0,    0)    scale(1.00); opacity: 0.65; }
+}
+
+@keyframes aurora-drift-4 {
+  0%   { transform: translate(0,    0)    scale(1.00); opacity: 0.75; }
+  40%  { transform: translate(5vw, -4vh)  scale(1.08); opacity: 0.95; }
+  70%  { transform: translate(2vw,  2vh)  scale(0.94); opacity: 0.68; }
+  88%  { transform: translate(4vw, -1vh)  scale(1.04); opacity: 0.85; }
+  100% { transform: translate(0,    0)    scale(1.00); opacity: 0.75; }
+}
+
+@keyframes aurora-drift-5 {
+  0%   { transform: translate(0,    0)    scale(1.00); opacity: 0.68; }
+  32%  { transform: translate(-4vw,-3vh)  scale(1.09); opacity: 0.88; }
+  62%  { transform: translate(-2vw, 5vh)  scale(0.93); opacity: 0.60; }
+  87%  { transform: translate(-3vw, 2vh)  scale(1.05); opacity: 0.78; }
+  100% { transform: translate(0,    0)    scale(1.00); opacity: 0.68; }
+}
+
+/* Accessibility: honour reduced-motion preference */
+@media (prefers-reduced-motion: reduce) {
+  .aurora-blob { animation: none !important; }
+}
+
+/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+   PANEL GLASS OVERLAYS â€” pure black glass
+   â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+
+.panel-rail {
+  background: rgba(3, 3, 3, 0.72) !important;
+  border-right: 1px solid rgba(255, 255, 255, 0.042) !important;
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+}
+
+.panel-sidebar {
+  background: rgba(5, 5, 5, 0.60) !important;
+  border-right: 1px solid rgba(255, 255, 255, 0.048) !important;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+.panel-chat {
+  background: rgba(3, 3, 3, 0.42) !important;
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+}
+
+.panel-chat-bar {
+  background: rgba(5, 5, 5, 0.65) !important;
+  border-color: rgba(255, 255, 255, 0.048) !important;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+/* RelayMesh logo ring pulse */
+@keyframes rm-pulse {
+  0%, 100% { opacity: 0.18; transform: scale(1);   }
+  50%       { opacity: 0.38; transform: scale(1.06); }
+}
+@keyframes rm-spin-slow {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+@keyframes rm-spin-rev {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(-360deg); }
+}
+@keyframes rm-node-blink {
+  0%, 100% { opacity: 1;   }
+  50%      { opacity: 0.35; }
+}
+
+.rm-logo-pulse     { animation: rm-pulse      4s  ease-in-out infinite; }
+.rm-logo-ring-out  { animation: rm-spin-slow  18s linear       infinite; }
+.rm-logo-ring-in   { animation: rm-spin-rev   12s linear       infinite; }
+.rm-node-a { animation: rm-node-blink 2.8s ease-in-out infinite; }
+.rm-node-b { animation: rm-node-blink 2.8s ease-in-out infinite 0.9s; }
+.rm-node-c { animation: rm-node-blink 2.8s ease-in-out infinite 1.8s; }
+
+@media (prefers-reduced-motion: reduce) {
+  .rm-logo-pulse, .rm-logo-ring-out,
+  .rm-logo-ring-in, .rm-node-a,
+  .rm-node-b, .rm-node-c { animation: none !important; }
+}
+
+/* â”€â”€â”€ Auth Component System â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+
 .auth-pill-btn {
   width: 100%;
   display: flex;
@@ -42,76 +255,39 @@ body {
   cursor: pointer;
   transition: all 0.2s ease;
 }
-
-.auth-pill-btn:hover {
-  background: rgba(255, 255, 255, 0.10);
-}
-
-/* Pill button — primary (submit) */
+.auth-pill-btn:hover { background: rgba(255, 255, 255, 0.10); }
 .auth-pill-btn--primary {
   background: rgba(255, 255, 255, 0.07);
   border-color: rgba(255, 255, 255, 0.14);
 }
-
-.auth-pill-btn--primary:hover {
-  background: rgba(255, 255, 255, 0.12);
-}
-
-/* Badge on right side of pill button */
+.auth-pill-btn--primary:hover { background: rgba(255, 255, 255, 0.12); }
 .auth-pill-badge {
-  width: 1.75rem;
-  height: 1.75rem;
+  width: 1.75rem; height: 1.75rem;
   border-radius: 0.625rem;
   background: rgba(255, 255, 255, 0.10);
   border: 1px solid rgba(255, 255, 255, 0.10);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center; flex-shrink: 0;
 }
-
-/* Badge — primary variant */
 .auth-pill-badge--primary {
   background: rgba(99, 102, 241, 0.75);
   border-color: rgba(99, 102, 241, 0.45);
 }
-
-/* Input field */
 .auth-input {
   width: 100%;
   background: rgba(255, 255, 255, 0.04);
   border: 1px solid rgba(255, 255, 255, 0.09);
   border-radius: 1rem;
   padding: 0.875rem 1rem;
-  color: #fff;
-  font-size: 0.875rem;
-  font-weight: 300;
-  outline: none;
-  transition: all 0.2s ease;
+  color: #fff; font-size: 0.875rem; font-weight: 300;
+  outline: none; transition: all 0.2s ease;
 }
-
-.auth-input::placeholder {
-  color: rgba(156, 163, 175, 0.5);
-}
-
-/* Prevent iOS Safari auto-zoom on focus (needs >=16px font) */
-@media (max-width: 640px) {
-  .auth-input {
-    font-size: 16px;
-  }
-}
-
+.auth-input::placeholder { color: rgba(156, 163, 175, 0.5); }
+@media (max-width: 640px) { .auth-input { font-size: 16px; } }
 .auth-input:focus {
   border-color: rgba(255, 255, 255, 0.18);
   box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.08);
 }
-
-/* Input with left icon — override padding */
-.auth-input-icon {
-  padding-left: 2.75rem !important;
-}
-
-/* ─── Browser autofill dark override ────────────────── */
+.auth-input-icon { padding-left: 2.75rem !important; }
 .auth-input:-webkit-autofill,
 .auth-input:-webkit-autofill:hover,
 .auth-input:-webkit-autofill:focus,
@@ -123,30 +299,14 @@ body {
   transition: background-color 9999s ease-in-out 0s;
 }
 
-/* ─── Custom scrollbar ───────────────────────────────── */
-.custom-scrollbar::-webkit-scrollbar {
-  width: 6px;
-}
-
-.custom-scrollbar::-webkit-scrollbar-track {
-  background: transparent;
-}
-
+/* â”€â”€â”€ Custom scrollbar â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+.custom-scrollbar::-webkit-scrollbar { width: 6px; }
+.custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
 .custom-scrollbar::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.08);
-  border-radius: 3px;
+  background: rgba(255, 255, 255, 0.08); border-radius: 3px;
 }
-
 .custom-scrollbar::-webkit-scrollbar-thumb:hover {
   background: rgba(255, 255, 255, 0.16);
 }
-
-/* ─── Hide scrollbar (quick-access avatar row) ───────── */
-.no-scrollbar::-webkit-scrollbar {
-  display: none;
-}
-
-.no-scrollbar {
-  -ms-overflow-style: none;
-  scrollbar-width: none;
-}
+.no-scrollbar::-webkit-scrollbar { display: none; }
+.no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
