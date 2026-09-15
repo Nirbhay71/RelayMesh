@@ -107,9 +107,10 @@ const AddContactModal = ({ isOpen, onClose, onContactAdded, onSelectContact }) =
 
     const getAvatarColor = (name) => {
         const colors = [
-            'from-blue-500 to-cyan-500', 'from-purple-500 to-pink-500',
-            'from-green-500 to-emerald-500', 'from-orange-500 to-amber-500',
-            'from-red-500 to-rose-500', 'from-indigo-500 to-violet-500',
+            'from-zinc-700 to-zinc-900', 'from-neutral-600 to-neutral-800',
+            'from-gray-700 to-black', 'from-stone-600 to-stone-900',
+            'from-neutral-700 to-black', 'from-zinc-800 to-black',
+            'from-gray-600 to-gray-900', 'from-stone-700 to-black',
         ];
         let hash = 0;
         for (let i = 0; i < (name?.length || 0); i++) {
@@ -139,7 +140,7 @@ const AddContactModal = ({ isOpen, onClose, onContactAdded, onSelectContact }) =
                         {/* Header */}
                         <div className="flex items-center justify-between px-6 py-4 border-b border-white/[0.07]">
                             <div className="flex items-center gap-3">
-                                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#3B82F6] to-[#2563EB] flex items-center justify-center">
+                                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-zinc-700 to-black flex items-center justify-center">
                                     <UserPlus className="w-5 h-5 text-white" />
                                 </div>
                                 <div>
@@ -162,7 +163,7 @@ const AddContactModal = ({ isOpen, onClose, onContactAdded, onSelectContact }) =
                                 <input
                                     type="text"
                                     placeholder="Type name or email address..."
-                                    className="w-full bg-white/[0.04] border border-white/[0.09] rounded-xl py-2.5 pl-10 pr-10 text-white text-sm placeholder:text-gray-500 focus:outline-none focus:border-[#3B82F6]/50 transition-all font-light"
+                                    className="w-full bg-white/[0.04] border border-white/[0.09] rounded-xl py-2.5 pl-10 pr-10 text-white text-sm placeholder:text-gray-500 focus:outline-none focus:border-white/40 transition-all font-light"
                                     value={query}
                                     onChange={(e) => setQuery(e.target.value)}
                                     autoFocus
@@ -189,7 +190,7 @@ const AddContactModal = ({ isOpen, onClose, onContactAdded, onSelectContact }) =
                         <div className="flex-1 overflow-y-auto p-4 space-y-2 custom-scrollbar min-h-[220px]">
                             {loading ? (
                                 <div className="flex flex-col items-center justify-center py-12 text-gray-500 gap-2">
-                                    <Loader2 className="w-6 h-6 animate-spin text-[#60A5FA]" />
+                                    <Loader2 className="w-6 h-6 animate-spin text-white/70" />
                                     <span className="text-xs">Searching users...</span>
                                 </div>
                             ) : !query.trim() ? (
@@ -219,7 +220,7 @@ const AddContactModal = ({ isOpen, onClose, onContactAdded, onSelectContact }) =
                                                     <div className="flex items-center gap-1.5">
                                                         <p className="text-white font-medium text-sm truncate">{u.username}</p>
                                                         {u.isOnline && (
-                                                            <span className="w-2 h-2 rounded-full bg-green-500 shadow-sm" />
+                                                            <span className="w-2 h-2 rounded-full bg-white shadow-sm" />
                                                         )}
                                                     </div>
                                                     <p className="text-gray-500 text-xs truncate">{u.email}</p>
@@ -235,7 +236,7 @@ const AddContactModal = ({ isOpen, onClose, onContactAdded, onSelectContact }) =
                                                     <button
                                                         onClick={() => handleAddContact(u)}
                                                         disabled={isAdding}
-                                                        className="text-xs bg-white/10 hover:bg-[#3B82F6] hover:text-white text-gray-300 px-3 py-1.5 rounded-lg transition-all flex items-center gap-1 font-medium"
+                                                        className="text-xs bg-white/10 hover:bg-white hover:text-black text-gray-300 px-3 py-1.5 rounded-lg transition-all flex items-center gap-1 font-medium"
                                                     >
                                                         {isAdding ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <UserPlus className="w-3.5 h-3.5" />}
                                                         Add
@@ -244,7 +245,7 @@ const AddContactModal = ({ isOpen, onClose, onContactAdded, onSelectContact }) =
 
                                                 <button
                                                     onClick={() => handleStartChat(u)}
-                                                    className="text-xs bg-[#3B82F6] hover:bg-[#2563EB] text-white px-3 py-1.5 rounded-lg shadow-md transition-all flex items-center gap-1 font-medium"
+                                                    className="text-xs bg-white hover:bg-gray-200 text-black px-3 py-1.5 rounded-lg shadow-md transition-all flex items-center gap-1 font-medium"
                                                 >
                                                     <MessageSquare className="w-3.5 h-3.5" />
                                                     Message

@@ -77,8 +77,15 @@ const removeUserOnline = async (userId, socketId) => {
  * Check if a user has any active socket connections.
  */
 const isUserOnline = async (userId) => {
-    const count = await redis.scard(`online:${userId}`)
-    return count > 0
+    try {
+        const count = await redis.scard(`online:${userId}`)
+        return count > 0
+    } catch (err) {
+        // Redis being unreachable shouldn't take down features (e.g. the contacts
+        // list) that only need online status as decoration.
+        console.error("isUserOnline error:", err.message)
+        return false
+    }
 }
 
 /**
@@ -90,14 +97,21 @@ const getOnlineStatusMap = async (userIds) => {
     const statusMap = new Map();
     if (!userIds.length) return statusMap;
 
-    const pipeline = redis.pipeline();
-    userIds.forEach((id) => pipeline.scard(`online:${id}`));
-    const results = await pipeline.exec();
+    try {
+        const pipeline = redis.pipeline();
+        userIds.forEach((id) => pipeline.scard(`online:${id}`));
+        const results = await pipeline.exec();
 
-    userIds.forEach((id, i) => {
-        const count = results[i]?.[1] || 0;
-        statusMap.set(id, count > 0);
-    });
+        userIds.forEach((id, i) => {
+            const count = results[i]?.[1] || 0;
+            statusMap.set(id, count > 0);
+        });
+    } catch (err) {
+        // A Redis hiccup shouldn't 500 the whole sidebar/contacts request — fall
+        // back to "offline" for everyone rather than losing the contact list.
+        console.error("getOnlineStatusMap error:", err.message)
+        userIds.forEach((id) => statusMap.set(id, false));
+    }
 
     return statusMap;
 }

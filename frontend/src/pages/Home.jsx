@@ -79,6 +79,7 @@ const Home = () => {
     const [contactToDelete, setContactToDelete] = useState(null);
     const [searchQuery, setSearchQuery] = useState('');
     const [loadingContacts, setLoadingContacts] = useState(true);
+    const [sidebarError, setSidebarError] = useState(false);
     const [loadingMessages, setLoadingMessages] = useState(false);
     const [page, setPage] = useState(1);
     const [hasMore, setHasMore] = useState(true);
@@ -358,8 +359,10 @@ const Home = () => {
         try {
             const response = await axios.get(`${API_BASE}/contacts/sidebar`, { withCredentials: true });
             setContacts(response.data.data);
+            setSidebarError(false);
         } catch (error) {
             console.error("Error fetching sidebar:", error);
+            setSidebarError(true);
         } finally {
             setLoadingContacts(false);
         }
@@ -739,6 +742,16 @@ const Home = () => {
                                     <div className="flex items-center justify-center py-20">
                                         <div className="w-8 h-8 border-2 border-white/20 border-t-white rounded-full animate-spin"></div>
                                     </div>
+                                ) : sidebarError ? (
+                                    <div className="flex flex-col items-center justify-center py-16 text-gray-500 text-sm gap-3 px-6 text-center">
+                                        <p>Couldn't load your contacts.</p>
+                                        <button
+                                            onClick={() => { setLoadingContacts(true); fetchSidebar(); }}
+                                            className="text-xs bg-white/10 hover:bg-white hover:text-black text-gray-300 px-3 py-1.5 rounded-lg transition-all font-medium"
+                                        >
+                                            Retry
+                                        </button>
+                                    </div>
                                 ) : (
                                     <>
                                         {!searchQuery && starredContacts.length > 0 && (
@@ -795,7 +808,17 @@ const Home = () => {
                             <div className="flex-1 overflow-y-auto custom-scrollbar">
                                 {loadingContacts ? (
                                     <div className="flex items-center justify-center py-20">
-                                        <div className="w-8 h-8 border-2 border-[#3B82F6]/20 border-t-[#3B82F6] rounded-full animate-spin"></div>
+                                        <div className="w-8 h-8 border-2 border-white/20 border-t-white rounded-full animate-spin"></div>
+                                    </div>
+                                ) : sidebarError ? (
+                                    <div className="flex flex-col items-center justify-center py-16 text-gray-500 text-sm gap-3 px-6 text-center">
+                                        <p>Couldn't load your contacts.</p>
+                                        <button
+                                            onClick={() => { setLoadingContacts(true); fetchSidebar(); }}
+                                            className="text-xs bg-white/10 hover:bg-white hover:text-black text-gray-300 px-3 py-1.5 rounded-lg transition-all font-medium"
+                                        >
+                                            Retry
+                                        </button>
                                     </div>
                                 ) : savedContactsList.length === 0 ? (
                                     <div className="text-center py-12 text-gray-600 text-sm px-6">
