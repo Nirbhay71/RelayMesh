@@ -24,6 +24,12 @@ const ContactSchema = new mongoose.Schema({
         ref: "User",
         required: true,
     },
+
+    // Pinned to the quick-access row and the "Starred" section in the sidebar
+    starred: {
+        type: Boolean,
+        default: false,
+    },
 }, { timestamps: true })
 
 // Prevent duplicate contacts — a user cannot add the same person twice

@@ -55,4 +55,42 @@ const getConversationId = asyncHandler(async (req, res) => {
     );
 })
 
-export { getMessages, getConversationId }
+// ─────────────────────────────────────────────────
+// GET /messages/conversations/list
+// All conversations the user is part of, including ones started by
+// someone who hasn't been added as a contact yet. Contacts are one-way
+// (see Contact model) — this endpoint is what lets a message from an
+// unsaved sender still be discoverable in the UI.
+// ─────────────────────────────────────────────────
+const getConversations = asyncHandler(async (req, res) => {
+    const conversations = await ConversationModel.find({
+        type: "private",
+        participants: req.user._id,
+        lastMessage: { $ne: null },
+    })
+        .populate("participants", "username email avatar bio")
+        .populate("lastMessage")
+        .sort({ updatedAt: -1 })
+        .lean();
+
+    const results = conversations
+        .map((conv) => {
+            const other = conv.participants.find(
+                (p) => p._id.toString() !== req.user._id.toString()
+            );
+            if (!other) return null;
+            return {
+                conversationId: conv._id,
+                contact: other,
+                lastMessage: conv.lastMessage,
+                updatedAt: conv.updatedAt,
+            };
+        })
+        .filter(Boolean);
+
+    return res.status(200).json(
+        new ApiResponce(200, results, "Conversations fetched successfully")
+    );
+})
+
+export { getMessages, getConversationId, getConversations }
