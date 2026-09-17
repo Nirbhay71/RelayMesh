@@ -17,7 +17,7 @@ function App() {
         It stays on screen covering everything while loading is true,
         and then crossfades into the app once loading completes. 
       */}
-      <SplashReveal isLoading={loading} />
+      <SplashReveal isLoading={loading} isAuthenticated={!!user} />
 
       {/* Render the actual app routes only after loading is complete 
           so that Navigate redirects don't happen prematurely. */}

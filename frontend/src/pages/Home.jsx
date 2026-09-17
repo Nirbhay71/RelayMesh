@@ -991,13 +991,13 @@ const Home = () => {
                                 <svg viewBox="0 0 120 120" width="120" height="120" fill="none" xmlns="http://www.w3.org/2000/svg">
                                     <defs>
                                         <radialGradient id="hub-glow" cx="50%" cy="50%" r="50%">
-                                            <stop offset="0%"   stopColor="#ffffff" stopOpacity="0.95" />
-                                            <stop offset="60%"  stopColor="#cccccc" stopOpacity="0.55" />
-                                            <stop offset="100%" stopColor="#888888" stopOpacity="0"    />
+                                            <stop offset="0%" stopColor="#ffffff" stopOpacity="0.95" />
+                                            <stop offset="60%" stopColor="#cccccc" stopOpacity="0.55" />
+                                            <stop offset="100%" stopColor="#888888" stopOpacity="0" />
                                         </radialGradient>
                                         <radialGradient id="bg-glow" cx="50%" cy="50%" r="50%">
-                                            <stop offset="0%"   stopColor="#ffffff" stopOpacity="0.06" />
-                                            <stop offset="100%" stopColor="#ffffff" stopOpacity="0"    />
+                                            <stop offset="0%" stopColor="#ffffff" stopOpacity="0.06" />
+                                            <stop offset="100%" stopColor="#ffffff" stopOpacity="0" />
                                         </radialGradient>
                                         <filter id="node-blur">
                                             <feGaussianBlur stdDeviation="1.2" />
@@ -1013,7 +1013,7 @@ const Home = () => {
                                     {/* Outer rotating ring — solid thin circle with tick marks */}
                                     <g className="rm-logo-ring-out" style={{ transformOrigin: '60px 60px' }}>
                                         <circle cx="60" cy="60" r="50" stroke="rgba(255,255,255,0.12)" strokeWidth="0.8" />
-                                        {[0,60,120,180,240,300].map(a => {
+                                        {[0, 60, 120, 180, 240, 300].map(a => {
                                             const rad = (a * Math.PI) / 180;
                                             const x1 = 60 + 47 * Math.cos(rad), y1 = 60 + 47 * Math.sin(rad);
                                             const x2 = 60 + 50 * Math.cos(rad), y2 = 60 + 50 * Math.sin(rad);
@@ -1027,29 +1027,29 @@ const Home = () => {
                                     </g>
 
                                     {/* Six hex-orbit nodes + mesh connection lines */}
-                                    {[0,60,120,180,240,300].map((angle, i) => {
-                                        const rad      = ((angle - 90) * Math.PI) / 180;
+                                    {[0, 60, 120, 180, 240, 300].map((angle, i) => {
+                                        const rad = ((angle - 90) * Math.PI) / 180;
                                         const nx = 60 + 38 * Math.cos(rad);
                                         const ny = 60 + 38 * Math.sin(rad);
                                         // next node for ring-edge
-                                        const radN     = (((angle + 60) - 90) * Math.PI) / 180;
+                                        const radN = (((angle + 60) - 90) * Math.PI) / 180;
                                         const nxN = 60 + 38 * Math.cos(radN);
                                         const nyN = 60 + 38 * Math.sin(radN);
-                                        const blinkClass = ['rm-node-a','rm-node-b','rm-node-c','rm-node-a','rm-node-b','rm-node-c'][i];
+                                        const blinkClass = ['rm-node-a', 'rm-node-b', 'rm-node-c', 'rm-node-a', 'rm-node-b', 'rm-node-c'][i];
                                         return (
                                             <g key={angle}>
                                                 {/* spoke from hub to node */}
                                                 <line x1="60" y1="60" x2={nx} y2={ny}
-                                                      stroke="rgba(255,255,255,0.14)" strokeWidth="0.8" />
+                                                    stroke="rgba(255,255,255,0.14)" strokeWidth="0.8" />
                                                 {/* ring edge to next node */}
                                                 <line x1={nx} y1={ny} x2={nxN} y2={nyN}
-                                                      stroke="rgba(255,255,255,0.10)" strokeWidth="0.7" />
+                                                    stroke="rgba(255,255,255,0.10)" strokeWidth="0.7" />
                                                 {/* node glow halo */}
                                                 <circle cx={nx} cy={ny} r="5.5" fill="rgba(255,255,255,0.04)" filter="url(#node-blur)" />
                                                 {/* node dot */}
                                                 <circle cx={nx} cy={ny} r="2.8"
-                                                        fill="rgba(255,255,255,0.90)"
-                                                        className={blinkClass} />
+                                                    fill="rgba(255,255,255,0.90)"
+                                                    className={blinkClass} />
                                             </g>
                                         );
                                     })}
@@ -1061,13 +1061,15 @@ const Home = () => {
                                     <circle cx="60" cy="60" r="7.5" stroke="rgba(255,255,255,0.22)" strokeWidth="0.8" fill="rgba(255,255,255,0.06)" />
                                     <circle cx="60" cy="60" r="4.5" fill="rgba(255,255,255,0.60)" />
                                     {/* Hub core bright dot */}
-                                    <circle cx="60" cy="60" r="2"   fill="rgba(255,255,255,1)" />
+                                    <circle cx="60" cy="60" r="2" fill="rgba(255,255,255,1)" />
                                 </svg>
                             </div>
 
                             <h2 className="text-2xl font-bold tracking-tight mb-2"
-                                style={{ background: 'linear-gradient(135deg,#fff 30%,rgba(255,255,255,0.55) 100%)',
-                                         WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
+                                style={{
+                                    background: 'linear-gradient(135deg,#fff 30%,rgba(255,255,255,0.55) 100%)',
+                                    WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent'
+                                }}>
                                 RelayMesh
                             </h2>
                             <p className="text-gray-600 text-sm tracking-wide">Select a contact to start chatting</p>
