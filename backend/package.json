@@ -6,6 +6,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "run": "nodemon src/index.js",
+    "dev": "nodemon --exec \"node --import @feel-dev/node/register\" src/index.js",
     "generate-tokens": "node load-test/generate-tokens.cjs",
     "load-test": "npx artillery run load-test/load-test.yml",
     "load-test:report": "npx artillery run --output load-test/report.json load-test/load-test.yml && node load-test/generate-report.cjs load-test/report.json"
@@ -35,6 +36,7 @@
     "ua-parser-js": "^2.0.10"
   },
   "devDependencies": {
+    "@feel-dev/node": "^0.1.0",
     "artillery": "^2.0.33"
   }
 }
